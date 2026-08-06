@@ -14,9 +14,8 @@
   "kv_namespaces": [
     {
       "binding": "PDP_STORE",
-      // Create in the dashboard (Workers KV → Create Instance →
-      // "pdp_analytics_store") and paste the namespace id here.
-      "id": "REPLACE_WITH_KV_NAMESPACE_ID"
+      // namespace "pdp_analytics_store" (a namespace id is not a secret)
+      "id": "7312d1d6ac5f470e8ef9b9b95d7ff063"
     }
   ],
   "triggers": {

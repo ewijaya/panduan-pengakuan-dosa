@@ -27,6 +27,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+
+      # wrangler comes from the repo root's devDependencies — without this,
+      # wrangler-action's npx prompt cancels in CI
+      - run: npm ci
 
       - name: Deploy worker
         uses: cloudflare/wrangler-action@v3
