@@ -494,6 +494,11 @@ export async function onRequestGet({ request, env }) {
   .map { width: 100%; height: clamp(360px, 52vw, 580px); background: var(--bg); z-index: 0; border-radius: 4px; }
   .leaflet-container { font-family: system-ui, sans-serif; }
   .leaflet-control-attribution { font-size: 0.6rem; }
+  /* visitor count riding on each circle — a bare number, no tooltip chrome */
+  .count-label { background: transparent; border: none; box-shadow: none; padding: 0;
+    color: #fff; font-family: system-ui, sans-serif; font-size: 10px; font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.65), 0 0 3px rgba(0,0,0,0.5); pointer-events: none; }
+  .count-label::before { display: none; }
   @media (max-width: 560px) { .map { height: 400px; } }
 
   /* share bars */
@@ -629,16 +634,16 @@ export async function onRequestGet({ request, env }) {
   });
   map.addControl(new ResetControl());
   var max = Math.max(1, ...points.map(function (p) { return p.total; }));
-  var hoverable = window.matchMedia && matchMedia('(hover: hover)').matches;
   points.forEach(function (p) {
     var label = [p.city, p.region, p.country].filter(Boolean).join(', ');
     var marker = L.circleMarker([p.lat, p.lon], {
-      radius: 5 + 9 * Math.sqrt(p.total / max),
+      radius: 7 + 9 * Math.sqrt(p.total / max),
       stroke: false,
-      fillColor: dark ? '#E56B5C' : '#A81A1A', fillOpacity: 0.5,
+      fillColor: dark ? '#E56B5C' : '#A81A1A', fillOpacity: 0.55,
     }).addTo(map);
-    var text = label + ' — ' + p.total.toLocaleString('id-ID') + ' kunjungan';
-    if (hoverable) marker.bindTooltip(text);
+    // the count sits on the circle itself; place + count on tap/click
+    marker.bindTooltip(p.total.toLocaleString('id-ID'),
+      { permanent: true, direction: 'center', className: 'count-label' });
     marker.bindPopup('<strong>' + escapeHtml(label) + '</strong><br>' + p.total.toLocaleString('id-ID') + ' kunjungan');
   });
   // The view stays on Indonesia regardless of where points fall — zoom out
