@@ -22,7 +22,11 @@ export default function serviceWorker() {
     hooks: {
       "astro:build:done": async ({ dir, logger }) => {
         const dist = fileURLToPath(dir);
-        const files = walk(dist, dist).filter((f) => f !== "/sw.js");
+        // Never precache the worker itself, nor Pages Function sources — CI
+        // stages functions/ into dist/ for direct upload (.github/workflows).
+        const files = walk(dist, dist).filter(
+          (f) => f !== "/sw.js" && !f.startsWith("/functions/")
+        );
         // Serve pretty URLs for HTML: /a/index.html → /a/
         const urls = files.map((f) => f.replace(/index\.html$/, ""));
         const version = crypto

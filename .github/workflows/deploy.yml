@@ -22,6 +22,12 @@ jobs:
 
       - run: npm run build
 
+      # `wrangler pages deploy dist` is a direct upload: it only picks up
+      # Functions from <upload-dir>/functions. The sources live at the repo
+      # root (conventional for Pages), so stage them into the build output.
+      - name: Stage Pages Functions
+        run: cp -r functions dist/functions
+
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
