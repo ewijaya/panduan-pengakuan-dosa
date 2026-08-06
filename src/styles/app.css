@@ -74,75 +74,68 @@
   font-weight: 600;
 }
 
-/* ---- hero (image-backed: fixed light ink over the dark painting) --- */
+/* ---- hero: the full painting, mounted like a book plate ------------ */
 
-.hero {
-  position: relative;
-  overflow: hidden;
+.hero-plate {
   border-bottom: var(--rule-w) solid var(--edge);
-  background: #14100c;
+  background: var(--gloss);
 }
 
-.hero img {
-  position: absolute;
-  inset: 0;
+.plate-grid {
+  display: grid;
+  gap: calc(var(--space) * 8);
+  align-items: center;
+  padding-block: calc(var(--space) * 10);
+}
+
+@media (min-width: 900px) {
+  .plate-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+}
+
+.plate {
+  margin: 0;
+  justify-self: center;
+  max-width: min(24rem, 100%);
+}
+
+.plate img {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 22%;
-  opacity: 0.9;
+  height: auto; /* full painting, natural 1295:1600 aspect — never cropped */
+  background: var(--leaf);
+  border: var(--rule-w) solid var(--edge);
+  padding: calc(var(--space) * 2.5);
+  box-shadow: 0 18px 45px rgba(15, 10, 5, 0.22);
 }
 
-.hero .scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(10, 8, 5, 0.88) 0%, rgba(10, 8, 5, 0.45) 45%, rgba(10, 8, 5, 0.25) 100%);
+.plate figcaption {
+  text-align: center;
+  margin-top: calc(var(--space) * 2.5);
 }
 
-.hero .hero-inner {
-  position: relative;
-  padding-block: clamp(7rem, 24vw, 12rem) calc(var(--space) * 8);
-  color: #f4eede;
-}
+.plate-text .canticle { margin: calc(var(--space) * 2) 0 0; }
 
-.hero .kicker {
-  font-family: var(--font-ui);
-  font-size: var(--text-rubric);
-  font-weight: 600;
-  letter-spacing: var(--track-rubric);
-  text-transform: uppercase;
-  color: #e0c9a0;
-}
-
-.hero h1 {
-  font-family: var(--font-display);
-  font-size: var(--text-canticle);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--track-display);
-  margin: calc(var(--space) * 2) 0 0;
-}
-
-.hero .sub {
+.plate-sub {
   font-family: var(--font-display);
   font-size: var(--text-incipit);
+  color: var(--ink-soft);
   margin: calc(var(--space) * 1) 0 0;
-  color: #e8dfc8;
 }
 
-.hero .penyunting {
-  margin-top: calc(var(--space) * 5);
-  font-family: var(--font-ui);
-  font-size: var(--text-rubric);
-  letter-spacing: 0.06em;
-  color: #d9cdb2;
+.plate-text .penyunting { margin-top: calc(var(--space) * 6); }
+
+.penyunting-name {
+  font-family: var(--font-display);
+  font-size: var(--text-incipit);
+  margin: calc(var(--space) * 1) 0 calc(var(--space) * 3);
 }
-.hero .penyunting strong {
-  display: block;
-  font-family: var(--font-text);
-  font-size: 1.05rem;
-  letter-spacing: 0.01em;
-  color: #f4eede;
-  margin-top: calc(var(--space) * 1);
+
+.plate-cta {
+  display: inline-block;
+  text-decoration: none;
+  margin-top: calc(var(--space) * 5);
+  line-height: 44px;
+  padding-block: 0;
 }
 
 /* ---- generic page scaffolding ------------------------------------- */
@@ -290,14 +283,83 @@ p + p { margin-top: calc(var(--space) * 3); }
 
 a { color: var(--rubric); }
 
-.theme-toggle {
+/* ---- reading options (Pilihan Baca) -------------------------------- */
+
+/* Text size: scales the rem base, so the whole type scale follows and
+   line measures (set in rem) keep their character count. */
+html[data-fs="0"] { font-size: 85%; }
+html[data-fs="2"] { font-size: 115%; }
+html[data-fs="3"] { font-size: 132%; }
+html[data-fs="4"] { font-size: 155%; }
+html[data-fs="5"] { font-size: 180%; }
+html[data-fs="6"] { font-size: 210%; }
+
+html[data-measure="wide"] .wrap { max-width: 56rem; }
+
+.opt-btn {
   border: var(--rule-w) solid var(--edge);
   background: transparent;
   color: var(--ink-soft);
   border-radius: var(--radius);
-  font-family: var(--font-ui);
+  font-family: var(--font-text);
   font-size: var(--text-gloss);
   padding: calc(var(--space) * 1.5) calc(var(--space) * 2);
   cursor: pointer;
   white-space: nowrap;
+}
+.opt-btn:hover { border-color: var(--rubric); color: var(--ink); }
+
+.view-dialog {
+  border: var(--rule-w) solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--leaf);
+  color: var(--ink);
+  width: min(380px, 92vw);
+  padding: calc(var(--space) * 4) calc(var(--space) * 5);
+  margin: 10vh auto auto;
+  box-shadow: 0 20px 60px rgba(15, 10, 5, 0.35);
+}
+.view-dialog::backdrop { background: rgba(22, 19, 13, 0.5); backdrop-filter: blur(2px); }
+.view-dialog h2 { margin: 0 0 calc(var(--space) * 3); }
+
+.vrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--space) * 4);
+  padding-block: calc(var(--space) * 2.5);
+  font-family: var(--font-text);
+  font-size: 0.95rem;
+}
+.vrow + .vrow { border-top: var(--rule-w) solid var(--rule); }
+
+.seg { display: inline-flex; align-items: center; gap: calc(var(--space) * 1.5); }
+.seg button {
+  appearance: none;
+  border: var(--rule-w) solid var(--edge);
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  padding: calc(var(--space) * 1.5) calc(var(--space) * 2.5);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.seg button:hover { border-color: var(--rubric); color: var(--ink); }
+.seg button.on { border-color: var(--rubric); color: var(--rubric); background: var(--gloss); }
+
+.fs-dots {
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+  min-width: 4.5em;
+  text-align: center;
+}
+
+.vnote {
+  margin: calc(var(--space) * 3) 0 0;
+  font-size: var(--text-gloss);
+  font-style: italic;
+  color: var(--ink-soft);
 }

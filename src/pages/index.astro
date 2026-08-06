@@ -16,14 +16,21 @@ const CARDS = [
 ---
 
 <Base title="Sakramen Tobat (Pengakuan Dosa) — Panduan" current="/">
-  <section class="hero">
-    <Image src={painting} alt="Lukisan La confessione karya Giuseppe Molteni: seorang perempuan berlutut di ruang pengakuan dosa" widths={[480, 828, 1295]} sizes="100vw" loading="eager" />
-    <div class="scrim" aria-hidden="true"></div>
-    <div class="wrap hero-inner">
-      <p class="kicker">Keuskupan Surabaya · Diedarkan Secara Terbuka</p>
-      <h1>{b.cover.title}</h1>
-      <p class="sub">{b.cover.subtitle}</p>
-      <p class="penyunting">Penyunting<strong>{b.credits.penyunting}</strong></p>
+  <section class="hero-plate">
+    <div class="wrap plate-grid">
+      <figure class="plate">
+        <Image src={painting} alt="Lukisan La confessione karya Giuseppe Molteni: seorang perempuan berlutut di ruang pengakuan dosa" widths={[480, 828, 1295]} sizes="(min-width: 900px) 40vw, 92vw" loading="eager" />
+        <figcaption class="gloss"><em>La confessione</em> (1838) — Giuseppe Molteni</figcaption>
+      </figure>
+      <div class="plate-text">
+        <p class="rubric">Keuskupan Surabaya · Diedarkan Secara Terbuka</p>
+        <h1 class="canticle">{b.cover.title}</h1>
+        <p class="plate-sub">{b.cover.subtitle}</p>
+        <p class="penyunting rubric">Penyunting</p>
+        <p class="penyunting-name">{b.credits.penyunting}</p>
+        <p class="gloss">Nihil Obstat · Imprimatur — Keuskupan Surabaya, Juli 2019 (<a href="/tentang/">selengkapnya</a>)</p>
+        <a class="btn plate-cta" href="/lima-langkah/">Mulai — Lima Langkah</a>
+      </div>
     </div>
   </section>
 
