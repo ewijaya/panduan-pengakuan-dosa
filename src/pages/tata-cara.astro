@@ -116,6 +116,10 @@ if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[tata-cara] rite a
     let cur = 0;
     let all = true;
 
+    const prevBtn = document.getElementById("rite-prev") as HTMLButtonElement;
+    const nextBtn = document.getElementById("rite-next") as HTMLButtonElement;
+    const last = stepsEls.length - 1;
+
     function render() {
       root.classList.toggle("rite-all", all);
       controls.hidden = all;
@@ -123,11 +127,18 @@ if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[tata-cara] rite a
       leaves.forEach((l, i) => l.classList.toggle("is-done", all || i <= cur));
       pos.textContent = all ? `${stepsEls.length} langkah` : `Langkah ${cur + 1} dari ${stepsEls.length}`;
       toggleBtn.textContent = all ? "Satu per satu" : "Tampilkan semua";
+      prevBtn.disabled = cur === 0;
+      // the last step's "next" is the flow's next station, not a dead end
+      nextBtn.textContent = cur === last ? "Selesai →" : "Berikutnya →";
     }
 
     toggleBtn.addEventListener("click", () => { all = !all; cur = 0; render(); if (!all) stepsEls[0].scrollIntoView({ block: "center" }); });
-    document.getElementById("rite-prev")!.addEventListener("click", () => { if (cur > 0) { cur--; render(); } });
-    document.getElementById("rite-next")!.addEventListener("click", () => { if (cur < stepsEls.length - 1) { cur++; render(); } });
+    prevBtn.addEventListener("click", () => { if (cur > 0) { cur--; render(); } });
+    nextBtn.addEventListener("click", () => {
+      if (cur === last) { location.href = "/selesai/"; return; }
+      cur++;
+      render();
+    });
 
     render();
     initRiteExtras();
