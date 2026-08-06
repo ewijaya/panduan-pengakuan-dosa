@@ -32,7 +32,7 @@ const svg = `
 
   <line x1="64" y1="514" x2="${PANEL_W - 64}" y2="514" stroke="#DFD5BE" stroke-width="2"/>
 
-  <text x="64" y="550" font-family="Vollkorn" font-size="24" fill="#16130D">Pemeriksaan batin, doa, dan tata cara —</text>
+  <text x="64" y="550" font-family="Vollkorn" font-size="24" fill="#16130D">Pemeriksaan batin, doa, dan tata cara:</text>
   <text x="64" y="580" font-family="Vollkorn" font-size="24" fill="#16130D">panduan pengakuan dosa di genggaman.</text>
 
   <text x="64" y="612" font-family="Jost" font-weight="500" font-size="19" letter-spacing="1.5" fill="#57503F">panduan-pengakuan-dosa.pages.dev</text>
