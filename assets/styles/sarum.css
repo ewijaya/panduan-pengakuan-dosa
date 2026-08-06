@@ -114,8 +114,12 @@
      Roles, not sizes: pick by what the text IS.                  */
   --text-canticle: clamp(1.75rem, 1.4rem + 1.6vw, 2.375rem); /* screen titles      */
   --text-incipit:  clamp(1.31rem, 1.15rem + 0.8vw, 1.625rem);/* section headings   */
-  --text-lectio:   clamp(1rem,    0.95rem + 0.25vw, 1.125rem);/* body — questions,
-                                                                 prayers            */
+  --text-lectio:   clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem); /* body — questions,
+                                                                 prayers. Sized for
+                                                                 the confession-line
+                                                                 demographic; the Aa
+                                                                 control scales from
+                                                                 here.              */
   --text-rubric:   0.8125rem;                                 /* instructions, UI   */
   --text-gloss:    0.75rem;                                   /* folio nums, meta   */
 

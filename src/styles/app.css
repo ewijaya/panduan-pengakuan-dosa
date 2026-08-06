@@ -368,3 +368,207 @@ html[data-measure="wide"] .wrap { max-width: 56rem; }
   font-style: italic;
   color: var(--ink-soft);
 }
+
+/* Comfortable touch targets in the option rows (WCAG 2.5.8 and cold thumbs) */
+.seg button { min-height: 44px; }
+
+/* ---- high contrast (Pilihan Baca → Kontras: Tinggi) ----------------- */
+/* Same token names, harder values: secondary text darkens toward ink,
+   rules and edges stop whispering, the vellum grain gets out of the way. */
+
+html[data-contrast="high"] {
+  --ink-soft: #3A3422;
+  --rule: #A89A78;
+  --edge: #8F8468;
+  --grain-opacity: 0;
+}
+
+html[data-contrast="high"][data-theme="dark"] {
+  --ink-soft: #D9CFB4;
+  --rule: #55503F;
+  --edge: #6A6150;
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-contrast="high"]:not([data-theme="light"]) {
+    --ink-soft: #D9CFB4;
+    --rule: #55503F;
+    --edge: #6A6150;
+  }
+}
+
+/* ---- flow rail: Doa → Pemeriksaan Batin → Tata Cara → Selesai ------- */
+
+.flow-rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: calc(var(--space) * 2);
+  font-family: var(--font-ui);
+  font-size: var(--text-gloss);
+  letter-spacing: 0.04em;
+  margin-bottom: calc(var(--space) * 5);
+}
+
+.flow-rail a {
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.flow-rail a.is-done { color: var(--ink); }
+.flow-rail a[aria-current="step"] { color: var(--rubric); font-weight: 600; }
+.flow-sep { color: var(--ink-soft); opacity: 0.5; }
+
+/* ---- bottom tab bar (mobile) ---------------------------------------- */
+
+.tab-bar { display: none; }
+
+@media (max-width: 719px) {
+  body.has-tabs .site-nav { display: none; }
+  body.has-tabs { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  body.has-tabs .site-footer { margin-bottom: 0; }
+
+  body.has-tabs .tab-bar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    background: var(--leaf);
+    border-top: var(--rule-w) solid var(--edge);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .tab-bar a,
+  .tab-bar button {
+    appearance: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 56px;
+    padding: 6px 2px 4px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+  }
+
+  .tab-glyph {
+    display: block;
+    width: 1.7em;
+    height: 1.7em;
+    line-height: 1.7em;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    border: 1px solid var(--edge);
+    border-radius: 2px;
+  }
+
+  .tab-bar a[aria-current="page"] { color: var(--rubric); font-weight: 600; }
+  .tab-bar a[aria-current="page"] .tab-glyph {
+    background: var(--versal);
+    color: var(--versal-ink);
+    border-color: var(--versal-edge);
+  }
+}
+
+/* minimal mode (Mode Antre): header keeps only brand + Aa */
+body.minimal .site-nav { display: none; }
+
+.more-list { display: flex; flex-direction: column; }
+.more-list a {
+  font-family: var(--font-text);
+  font-size: var(--text-lectio);
+  color: var(--ink);
+  text-decoration: none;
+  padding-block: calc(var(--space) * 3);
+  border-top: var(--rule-w) solid var(--rule);
+}
+.more-list a:first-child { border-top: 0; }
+.more-list a[aria-current="page"] { color: var(--rubric); }
+
+/* ---- audience filter (Pemeriksaan Batin) ----------------------------- */
+
+.exam-group[hidden] { display: none; }
+
+/* Children read larger. */
+#exam-root[data-audience="anak"] .exam-row .lectio--soft {
+  font-size: calc(var(--text-lectio) * 1.15);
+}
+
+/* ---- Catatanku (marks recalled at the confession step) --------------- */
+
+.catatan {
+  background: var(--gloss);
+  border-left: 3px solid var(--versal);
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 3) calc(var(--space) * 4);
+  margin-top: calc(var(--space) * 3);
+}
+.catatan summary { cursor: pointer; }
+.catatan[open] summary { margin-bottom: calc(var(--space) * 2); }
+.catatan ul {
+  margin: 0;
+  padding-left: 1.1em;
+  font-family: var(--font-text);
+  line-height: var(--leading-lectio);
+}
+.catatan li + li { margin-top: calc(var(--space) * 2); }
+.catatan-sec { display: block; margin-bottom: calc(var(--space) * 0.5); }
+.catatan .gloss:last-child { margin-top: calc(var(--space) * 2); }
+
+/* ---- Mode Antre ------------------------------------------------------ */
+
+.antre-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--space) * 3);
+  margin-bottom: calc(var(--space) * 3);
+}
+.antre-top a { text-decoration: none; }
+
+/* The queue is not a place for small type. */
+.antre .rite-speech { font-size: clamp(1.3rem, 1.1rem + 1.2vw, 1.75rem); line-height: 1.45; }
+.antre .rite-action { font-size: var(--text-incipit); }
+
+.antre-controls {
+  position: sticky;
+  bottom: calc(var(--space) * 3);
+  display: flex;
+  gap: calc(var(--space) * 3);
+  margin-top: calc(var(--space) * 5);
+}
+.antre-controls .btn {
+  flex: 1;
+  min-height: 56px;
+  font-size: 0.95rem;
+}
+body.minimal { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ---- Selesai (penance, date, wipe) ----------------------------------- */
+
+.penance-input {
+  display: block;
+  width: 100%;
+  min-height: 6.5rem;
+  margin-top: calc(var(--space) * 3);
+  padding: calc(var(--space) * 3);
+  font-family: var(--font-text);
+  font-size: var(--text-lectio);
+  line-height: var(--leading-lectio);
+  color: var(--ink);
+  background: var(--leaf);
+  border: var(--rule-w) solid var(--edge);
+  border-radius: var(--radius);
+  resize: vertical;
+}
+.penance-input:focus-visible { outline: 2px solid var(--versal); outline-offset: 2px; }
