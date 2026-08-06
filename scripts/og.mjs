@@ -28,7 +28,7 @@ const svg = `
   <text x="60" y="390" font-family="Vollkorn SC" font-size="84" fill="#16130D">Tobat</text>
   <text x="64" y="442" font-family="Vollkorn" font-style="italic" font-size="36" fill="#57503F">(Pengakuan Dosa)</text>
 
-  <text x="64" y="486" font-family="Jost" font-weight="600" font-size="17" letter-spacing="3" fill="#A81A1A">PENYUNTING<tspan dx="14" font-family="Vollkorn" font-weight="400" font-size="24" letter-spacing="0" fill="#16130D">RD F.X. Zen Taufik</tspan></text>
+  <text x="64" y="484" font-family="Jost" font-weight="600" font-size="15" letter-spacing="3" fill="#A81A1A">PENYUNTING<tspan dx="12" font-family="Vollkorn" font-weight="400" font-size="19" letter-spacing="0" fill="#57503F">RD F.X. Zen Taufik</tspan></text>
 
   <line x1="64" y1="514" x2="${PANEL_W - 64}" y2="514" stroke="#DFD5BE" stroke-width="2"/>
 

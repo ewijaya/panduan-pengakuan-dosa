@@ -125,9 +125,10 @@
 .plate-text .penyunting { margin-top: calc(var(--space) * 6); }
 
 .penyunting-name {
-  font-family: var(--font-display);
-  font-size: var(--text-incipit);
-  margin: calc(var(--space) * 1) 0 calc(var(--space) * 3);
+  font-family: var(--font-text);
+  font-size: var(--text-lectio);
+  color: var(--ink-soft);
+  margin: calc(var(--space) * 0.5) 0 calc(var(--space) * 3);
 }
 
 .plate-cta {
