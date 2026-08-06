@@ -366,6 +366,12 @@ body { font-synthesis: none; }
   border: var(--rule-w) solid var(--edge);
 }
 
+/* a disabled step control should read as "no further", not "broken" */
+.btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 /* Examination checkbox — the mark is rubric red: ticking is something DONE */
 .mark {
   appearance: none;
