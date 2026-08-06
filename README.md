@@ -11,6 +11,8 @@ Content digitization is **complete** — all 17 booklet pages are transcribed ve
 ## Repository layout
 
 ```
+assets/
+  artwork/         # UI artwork — key image, with provenance and licensing
 content/
   images/          # 17 source photographs, img-01 … img-17, in booklet order
   pages/           # verbatim markdown, one file per page
@@ -18,6 +20,8 @@ content/
 docs/
   TRANSCRIPTION.md # image → page map and transcription conventions
 ```
+
+**Key image:** `assets/artwork/la-confessione-molteni.jpg` — *La confessione* (1838) by Giuseppe Molteni, the painting on the booklet cover. Public domain; full original rather than the cover crop. See [`assets/artwork/README.md`](assets/artwork/README.md) for provenance and usage notes.
 
 ## Content overview
 
@@ -52,5 +56,7 @@ Source booklet published openly (*"Diedarkan Secara Terbuka"*) by:
 > Imprimatur: RD Yosef Eko Budi Susilo, Vikjen Keuskupan Surabaya (16 Juli 2019)
 > Penyunting: RD F.X. Zen Taufik
 > Cover: *"La confessione"* oleh Molteni Giuseppe
+
+The cover painting itself is public domain and separately licensed from the booklet text — see [`assets/artwork/README.md`](assets/artwork/README.md).
 
 Credit the diocese in the app footer. Before publishing publicly, contact the diocese at the address above — the booklet carries an Imprimatur, and a derived app should not imply approval it has not been granted.
