@@ -253,6 +253,9 @@ p + p { margin-top: calc(var(--space) * 3); }
   align-items: center;
   margin-top: calc(var(--space) * 5);
 }
+/* `display: flex` above beats the UA's [hidden] rule — restate it, or the
+   step controls stay visible (and uselessly clickable) in show-all mode */
+.rite-controls[hidden] { display: none; }
 .rite-controls .spacer { flex: 1; }
 
 /* ---- footer --------------------------------------------------------- */
