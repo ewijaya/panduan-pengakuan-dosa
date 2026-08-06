@@ -1,0 +1,19 @@
+# Cloudflare Pages configuration.
+#
+# The static site itself needs none of this; it exists for the two Pages
+# Functions in functions/:
+#   /api/beacon  — anonymous, aggregate page-open counter (Analytics Engine)
+#   /admin       — ops dashboard reading that dataset via the SQL API
+#
+# /admin additionally needs two secrets on the Pages project (Settings →
+# Environment variables, or `wrangler pages secret put <NAME>`):
+#   ANALYTICS_ACCOUNT_ID   — Cloudflare account id
+#   ANALYTICS_READ_TOKEN   — API token with Account Analytics : Read
+
+name = "panduan-pengakuan-dosa"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-08-01"
+
+[[analytics_engine_datasets]]
+binding = "PDP_ANALYTICS"
+dataset = "pdp_events"

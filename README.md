@@ -23,8 +23,11 @@ docs/
   CORRECTIONS.md   # printing errors normalized in the app's presentation layer
 src/
   lib/booklet.ts   # build-time parser: content/pages → structured app data
-  pages/           # Astro routes (checklist, guided rite, prayers, about)
+  lib/client/      # device-only state: expiring marks, penance, dates
+  pages/           # Astro routes (guided flow, checklist, rite, queue mode)
+functions/         # Cloudflare Pages Functions: /api/beacon + /admin
 public/            # PWA manifest, icons, OG image
+wrangler.toml      # Pages config: Analytics Engine binding for the beacon
 .github/workflows/ # push to main → build → deploy to Cloudflare Pages
 ```
 
@@ -42,9 +45,17 @@ Build locally with `npm ci && npm run dev`. The site is fully static, offline-ca
 | 5–13 | Pemeriksaan Batin (10 Perintah, Perintah Gereja, 7 Dosa Pokok) | Interactive checklist — the core feature |
 | 13–16 | Tata Cara Pengakuan Dosa (Umat / Imam) | Guided rite, step-by-step |
 
+## The guided flow
+
+The app runs the booklet's own sequence end to end: **Doa → Pemeriksaan Batin → Tata Cara → Selesai**. Marks made during the examination are recalled privately at the rite's confession step ("Catatanku"); `/antre/` is a one-step-per-screen queue mode with large type and the screen kept awake; `/selesai/` holds the penance note (7-day expiry), the Doa Tobat, an opt-in last-confession date (a single timestamp, used to answer "kapan pengakuan terakhir" next time), and a one-tap wipe. Examination marks self-expire after 24 hours.
+
+## Admin & analytics
+
+`/admin` (functions/admin.js) is an aggregate-only ops dashboard in the style of hop-web's: page-open counts by day, page, place, device and language from an Analytics Engine dataset (`pdp_events`) written by `/api/beacon`. The beacon sends the path and nothing else — no cookies, no IDs, DNT/GPC respected — and examination marks never reach a server, so the dashboard has nothing sensitive to show. To activate it, set two secrets on the Pages project (Settings → Environment variables or `wrangler pages secret put`): `ANALYTICS_ACCOUNT_ID` and `ANALYTICS_READ_TOKEN` (API token with *Account Analytics : Read*). Until then `/admin` answers 503 with the same instructions.
+
 ## Design considerations
 
-- **Privacy is the defining constraint.** An examination of conscience is deeply personal. Nothing selected should leave the device — local storage only, no accounts, no analytics on selections, and an obvious one-tap clear. This should be stated plainly in the UI, not buried in a policy.
+- **Privacy is the defining constraint.** An examination of conscience is deeply personal. Nothing selected should leave the device — local storage only, no accounts, no analytics on selections, and an obvious one-tap clear. This should be stated plainly in the UI, not buried in a policy. Page-open counting (above) is the sole, deliberate exception, and it is anonymous, aggregate, and disclosed on `/tentang/`.
 - **Offline-first.** Churches have poor signal and phones get silenced. The app should work fully offline once loaded.
 - **Reverent, not gamified.** No streaks, no scores, no badges. Progress indicators should be quiet.
 - **Indonesian first.** Source text is Indonesian; keep it verbatim in the UI. English can come later as a translation layer, never replacing the original.

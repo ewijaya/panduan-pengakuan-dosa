@@ -44,7 +44,10 @@ self.addEventListener("activate", (e) => {
   );
 });
 self.addEventListener("fetch", (e) => {
-  if (e.request.method !== "GET" || new URL(e.request.url).origin !== self.location.origin) return;
+  const u = new URL(e.request.url);
+  if (e.request.method !== "GET" || u.origin !== self.location.origin) return;
+  // dynamic routes (Pages Functions) — never cache, never serve stale
+  if (u.pathname === "/admin" || u.pathname.startsWith("/admin/") || u.pathname.startsWith("/api/")) return;
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then(
       (hit) =>
