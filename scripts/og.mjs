@@ -28,12 +28,14 @@ const svg = `
   <text x="60" y="390" font-family="Vollkorn SC" font-size="84" fill="#16130D">Tobat</text>
   <text x="64" y="442" font-family="Vollkorn" font-style="italic" font-size="36" fill="#57503F">(Pengakuan Dosa)</text>
 
-  <line x1="64" y1="486" x2="${PANEL_W - 64}" y2="486" stroke="#DFD5BE" stroke-width="2"/>
+  <text x="64" y="486" font-family="Jost" font-weight="600" font-size="17" letter-spacing="3" fill="#A81A1A">PENYUNTING<tspan dx="14" font-family="Vollkorn" font-weight="400" font-size="24" letter-spacing="0" fill="#16130D">RD F.X. Zen Taufik</tspan></text>
 
-  <text x="64" y="528" font-family="Vollkorn" font-size="25" fill="#16130D">Pemeriksaan batin, doa, dan tata cara —</text>
-  <text x="64" y="560" font-family="Vollkorn" font-size="25" fill="#16130D">panduan pengakuan dosa di genggaman.</text>
+  <line x1="64" y1="514" x2="${PANEL_W - 64}" y2="514" stroke="#DFD5BE" stroke-width="2"/>
 
-  <text x="64" y="600" font-family="Jost" font-weight="500" font-size="19" letter-spacing="1.5" fill="#57503F">panduan-pengakuan-dosa.pages.dev</text>
+  <text x="64" y="550" font-family="Vollkorn" font-size="24" fill="#16130D">Pemeriksaan batin, doa, dan tata cara —</text>
+  <text x="64" y="580" font-family="Vollkorn" font-size="24" fill="#16130D">panduan pengakuan dosa di genggaman.</text>
+
+  <text x="64" y="612" font-family="Jost" font-weight="500" font-size="19" letter-spacing="1.5" fill="#57503F">panduan-pengakuan-dosa.pages.dev</text>
 </svg>`;
 
 const painting = await sharp("assets/artwork/la-confessione-molteni.jpg")
