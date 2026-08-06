@@ -48,8 +48,16 @@ async function sql(env, query) {
 
 export async function onRequestGet({ request, env }) {
   if (!env.ANALYTICS_READ_TOKEN || !env.ANALYTICS_ACCOUNT_ID) {
+    // Presence booleans only — never values. Which piece of config reached
+    // this deployment is the question this page needs to answer.
+    const have = (k) => (env[k] ? "ada" : "TIDAK ADA");
     return new Response(
-      "Dashboard belum dikonfigurasi.\n\nTambahkan secret ANALYTICS_ACCOUNT_ID dan ANALYTICS_READ_TOKEN pada proyek Pages\n(Settings → Environment variables), lalu deploy ulang.",
+      "Dashboard belum dikonfigurasi.\n\n" +
+        `ANALYTICS_ACCOUNT_ID: ${have("ANALYTICS_ACCOUNT_ID")}\n` +
+        `ANALYTICS_READ_TOKEN: ${have("ANALYTICS_READ_TOKEN")}\n` +
+        `PDP_ANALYTICS (binding): ${have("PDP_ANALYTICS")}\n\n` +
+        "Tambahkan yang belum ada pada proyek Pages (Settings → Variables and Secrets\n" +
+        "/ Bindings), lalu buat deployment baru.",
       { status: 503, headers: { "content-type": "text/plain; charset=utf-8" } },
     );
   }
