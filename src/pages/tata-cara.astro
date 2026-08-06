@@ -1,8 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
+import FlowRail from "../components/FlowRail.astro";
 import { loadBooklet } from "../lib/booklet";
 import type { RitePart } from "../lib/booklet";
 import { loadDoaTobat } from "../lib/supplement";
+import { examTextsJson } from "../lib/exam-texts";
 
 const b = loadBooklet();
 const { petunjuk, steps } = b.tataCara;
@@ -10,10 +12,17 @@ const doaTobat = loadDoaTobat();
 
 const renderPart = (p: RitePart) =>
   p.kind === "speech" ? "rite-speech" : p.kind === "action" ? "rite-action lectio" : "rite-note";
+
+/* Anchor steps by their booklet text — THROW if the source drifts,
+   same contract as src/lib/booklet.ts. */
+const lastConfIdx = steps.findIndex((st) => st.umat.some((p) => p.text.includes("Pengakuan saya yang terakhir")));
+const confessIdx = steps.findIndex((st) => st.umat.some((p) => p.text.includes("Dosa-dosa saya adalah")));
+if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[tata-cara] rite anchor steps not found");
 ---
 
 <Base title="Tata Cara Pengakuan Dosa — Panduan Pengakuan Dosa" current="/tata-cara/">
   <main class="wrap">
+    <FlowRail current="rite" />
     <p class="rubric page-kicker">Tata Cara</p>
     <h1 class="canticle page-title">Tata Cara Pengakuan Dosa</h1>
 
@@ -30,7 +39,9 @@ const renderPart = (p: RitePart) =>
     <div class="exam-controls" style="margin-top: calc(var(--space) * 6);">
       <span class="gloss" id="rite-pos" aria-live="polite"></span>
       <button class="btn btn--quiet" id="rite-toggle-all" type="button">Tampilkan semua</button>
+      <a class="btn btn--quiet" href="/antre/" style="text-decoration: none;">Mode Antre</a>
     </div>
+    <p class="gloss" style="margin-bottom: calc(var(--space) * 3);">Mode Antre: satu langkah per layar dengan huruf besar — untuk dibaca sambil menunggu giliran.</p>
     <div class="gathering" id="rite-gathering" aria-hidden="true">
       {steps.map(() => <i></i>)}
     </div>
@@ -55,6 +66,14 @@ const renderPart = (p: RitePart) =>
                   )}
                 </>
               ))}
+              {i === lastConfIdx && <p class="gloss" id="last-ago" hidden></p>}
+              {i === confessIdx && (
+                <details class="catatan" id="catatan" hidden>
+                  <summary class="rubric">Catatanku — tanda pemeriksaan batin</summary>
+                  <ul id="catatan-list"></ul>
+                  <p class="gloss">Hanya tersimpan di perangkat ini; terhapus otomatis setelah 24 jam.</p>
+                </details>
+              )}
             </div>
           )}
           {st.imam.length > 0 && (
@@ -79,14 +98,15 @@ const renderPart = (p: RitePart) =>
     <section class="folio">
       <p class="rubric">Selesai</p>
       <p class="lectio">Segera setelah keluar dari Ruang Pengakuan Dosa, lakukanlah Penitensimu, dan pergilah dalam damai, serta jangan berbuat dosa lagi.</p>
-      <div class="rite-controls">
-        <button class="btn btn--quiet" id="rite-clear-marks" type="button">Hapus tanda pemeriksaan batin</button>
-      </div>
-      <p class="gloss" style="margin-top: calc(var(--space) * 2);" id="rite-clear-done" hidden>Semua tanda telah dihapus dari perangkat ini.</p>
     </section>
+    <a class="next-link" href="/selesai/">Lanjut · Selesai — Penitensi &amp; Doa Tobat →</a>
   </main>
 
+  <script is:inline type="application/json" id="exam-texts" set:html={examTextsJson(b)} />
+
   <script>
+    import { initRiteExtras } from "../lib/client/rite";
+
     const root = document.getElementById("rite-root")!;
     const stepsEls = [...document.querySelectorAll<HTMLElement>(".rite-step")];
     const leaves = document.querySelectorAll<HTMLElement>("#rite-gathering i");
@@ -109,11 +129,7 @@ const renderPart = (p: RitePart) =>
     document.getElementById("rite-prev")!.addEventListener("click", () => { if (cur > 0) { cur--; render(); } });
     document.getElementById("rite-next")!.addEventListener("click", () => { if (cur < stepsEls.length - 1) { cur++; render(); } });
 
-    document.getElementById("rite-clear-marks")!.addEventListener("click", () => {
-      localStorage.removeItem("pb-marks-v1");
-      document.getElementById("rite-clear-done")!.hidden = false;
-    });
-
     render();
+    initRiteExtras();
   </script>
 </Base>

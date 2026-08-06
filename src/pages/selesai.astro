@@ -1,0 +1,107 @@
+---
+import Base from "../layouts/Base.astro";
+import FlowRail from "../components/FlowRail.astro";
+import { loadDoaTobat } from "../lib/supplement";
+
+/**
+ * Selesai — the step the paper booklet cannot do: right after confession,
+ * hold the penance privately, offer the Doa Tobat, optionally remember the
+ * date (a single timestamp, for next time's "kapan pengakuan terakhir"),
+ * and clear every mark from the device.
+ */
+
+const doaTobat = loadDoaTobat();
+---
+
+<Base title="Selesai — Pergilah dalam Damai" current="">
+  <main class="wrap">
+    <FlowRail current="selesai" />
+    <p class="rubric page-kicker">Selesai</p>
+    <h1 class="canticle page-title">Pergilah dalam Damai</h1>
+
+    <div class="stack">
+      <section class="folio">
+        <p class="lectio">Segera setelah keluar dari Ruang Pengakuan Dosa, lakukanlah Penitensimu, dan pergilah dalam damai, serta jangan berbuat dosa lagi.</p>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit"><span class="versal" aria-hidden="true">P</span>Penitensi Saya</h2>
+        <p class="gloss">Catat penitensi yang diberikan Imam agar tidak terlupa. Catatan ini hanya tersimpan di perangkat ini dan terhapus dengan sendirinya setelah 7 hari.</p>
+        <label class="gloss" for="penance" style="display: none;">Catatan penitensi</label>
+        <textarea class="penance-input" id="penance" rows="4" placeholder="Contoh: doa, refleksi, atau perbuatan tertentu yang diberikan Imam…"></textarea>
+        <div class="rite-controls">
+          <button class="btn btn--quiet" id="penance-clear" type="button">Sudah kulakukan — hapus catatan</button>
+        </div>
+        <p class="gloss" id="penance-done" hidden>Catatan penitensi telah dihapus.</p>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit"><span class="versal" aria-hidden="true">D</span>Doa Tobat (PS. 25)</h2>
+        <div class="oratio" lang="id">
+          {doaTobat.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit"><span class="versal" aria-hidden="true">T</span>Tanggal Pengakuan</h2>
+        <p class="lectio">Bila dicatat, aplikasi dapat membantu menjawab <em>"kapan pengakuan terakhir"</em> pada pengakuan berikutnya. Hanya satu tanggal yang disimpan — tidak ada riwayat.</p>
+        <p class="gloss" id="last-now" hidden></p>
+        <div class="rite-controls">
+          <button class="btn btn--quiet" id="record-date" type="button">Catat hari ini sebagai pengakuan terakhir</button>
+          <button class="btn btn--quiet" id="forget-date" type="button" hidden>Hapus tanggal</button>
+        </div>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit"><span class="versal" aria-hidden="true">S</span>Selesai</h2>
+        <p class="lectio">Hapus seluruh tanda pemeriksaan batin dari perangkat ini.</p>
+        <div class="rite-controls">
+          <button class="btn" id="wipe" type="button">Hapus semua tanda</button>
+        </div>
+        <p class="gloss" id="wipe-done" hidden>Semua tanda telah dihapus. Pergilah dalam damai.</p>
+      </section>
+    </div>
+
+    <p class="ornament" aria-hidden="true">• • •</p>
+    <a class="next-link" href="/">Kembali ke Beranda →</a>
+  </main>
+
+  <script>
+    import {
+      loadPenance, savePenance, clearPenance,
+      lastConfession, recordConfession, clearLastConfession, agoText,
+      clearMarks,
+    } from "../lib/client/store";
+
+    const $ = (id: string) => document.getElementById(id)!;
+
+    /* penance note */
+    const penance = $("penance") as HTMLTextAreaElement;
+    penance.value = loadPenance();
+    penance.addEventListener("input", () => savePenance(penance.value));
+    $("penance-clear").addEventListener("click", () => {
+      clearPenance();
+      penance.value = "";
+      $("penance-done").hidden = false;
+    });
+
+    /* last confession date */
+    const paintDate = () => {
+      const last = lastConfession();
+      const now = $("last-now");
+      $("forget-date").hidden = last === null;
+      if (last === null) { now.hidden = true; return; }
+      now.textContent = `Tercatat: ${agoText(last)} (${new Date(last).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}).`;
+      now.hidden = false;
+    };
+    $("record-date").addEventListener("click", () => { recordConfession(); paintDate(); });
+    $("forget-date").addEventListener("click", () => { clearLastConfession(); paintDate(); });
+    paintDate();
+
+    /* wipe all examination marks */
+    $("wipe").addEventListener("click", () => {
+      clearMarks();
+      $("wipe-done").hidden = false;
+    });
+  </script>
+</Base>

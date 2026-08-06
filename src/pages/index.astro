@@ -29,12 +29,19 @@ const CARDS = [
         <p class="penyunting rubric">Penyunting</p>
         <p class="penyunting-name">{b.credits.penyunting}</p>
         <p class="gloss">Nihil Obstat · Imprimatur — Keuskupan Surabaya, Juli 2019 (<a href="/tentang/">selengkapnya</a>)</p>
-        <a class="btn plate-cta" href="/lima-langkah/">Mulai — Lima Langkah</a>
+        <a class="btn plate-cta" href="/doa/">Mulai Pengakuan Dosa</a>
+        <p class="gloss" style="margin-top: calc(var(--space) * 2);">Doa → Pemeriksaan Batin → Tata Cara → Selesai</p>
+        <p class="gloss" id="last-conf" hidden></p>
       </div>
     </div>
   </section>
 
   <main class="wrap">
+    <div class="folio" id="nudge" hidden>
+      <p class="rubric">Undangan</p>
+      <p class="lectio" id="nudge-text"></p>
+    </div>
+
     <div class="folio">
       <p class="rubric">Privasi</p>
       <p>Panduan ini berjalan sepenuhnya di perangkat Anda. Tanda apa pun yang Anda buat pada Pemeriksaan Batin <strong>tersimpan hanya di perangkat ini</strong> — tanpa akun, tanpa server, tanpa pelacakan — dan dapat dihapus kapan saja dengan satu tombol.</p>
@@ -52,4 +59,21 @@ const CARDS = [
       ))}
     </div>
   </main>
+
+  <script>
+    import { lastConfession, agoText, seasonalNudge } from "../lib/client/store";
+
+    const last = lastConfession();
+    if (last !== null) {
+      const el = document.getElementById("last-conf")!;
+      el.textContent = `Pengakuan dosa terakhir: ${agoText(last)}.`;
+      el.hidden = false;
+    }
+
+    const nudge = seasonalNudge(last);
+    if (nudge) {
+      document.getElementById("nudge-text")!.textContent = nudge;
+      document.getElementById("nudge")!.hidden = false;
+    }
+  </script>
 </Base>

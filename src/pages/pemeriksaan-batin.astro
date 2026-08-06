@@ -1,17 +1,35 @@
 ---
 import Base from "../layouts/Base.astro";
+import FlowRail from "../components/FlowRail.astro";
 import { loadBooklet } from "../lib/booklet";
 
 const b = loadBooklet();
 const pb = b.pemeriksaanBatin;
 const versalFor = (i: number) => ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][i];
+
+/** Map the booklet's printed subgroup labels to audience filter keys. */
+const audFor = (label: string | null) =>
+  label === "Bagi Anak-Anak" ? "anak"
+  : label === "Bagi Orang Tua" ? "ortu"
+  : label === "Bagi Atasan dan Bawahan" ? "atasan"
+  : undefined;
 ---
 
 <Base title="Pemeriksaan Batin — Panduan Pengakuan Dosa" current="/pemeriksaan-batin/">
   <main class="wrap">
+    <FlowRail current="batin" />
     <p class="rubric page-kicker">Pemeriksaan Batin</p>
     <h1 class="canticle page-title">Pemeriksaan Batin</h1>
     <p class="exam-quote lectio"><em>{pb.epigraph}</em></p>
+
+    <div class="exam-controls" role="group" aria-label="Untuk siapa pemeriksaan ini">
+      <span class="gloss">Untuk</span>
+      <span class="seg" id="aud-seg">
+        <button type="button" data-aud="semua">Semua</button>
+        <button type="button" data-aud="anak">Anak-Anak</button>
+        <button type="button" data-aud="ortu">Orang Tua</button>
+      </span>
+    </div>
 
     <div class="exam-controls">
       <span class="gloss exam-count" id="exam-count" aria-live="polite">0 tanda</span>
@@ -28,7 +46,7 @@ const versalFor = (i: number) => ["I", "II", "III", "IV", "V", "VI", "VII", "VII
           <h2 class="incipit"><span class="versal" aria-hidden="true">{versalFor(si)}</span>{s.label}</h2>
           {s.quote && <p class="exam-quote"><em>"{s.quote}"</em></p>}
           {s.groups.map((g, gi) => (
-            <>
+            <div class="exam-group" data-aud={audFor(g.label)}>
               {g.label && <p class="rubric exam-group-label">{g.label}</p>}
               <div class="quire">
                 {g.questions.map((q, qi) => (
@@ -38,7 +56,7 @@ const versalFor = (i: number) => ["I", "II", "III", "IV", "V", "VI", "VII", "VII
                   </label>
                 ))}
               </div>
-            </>
+            </div>
           ))}
         </section>
       ))}
@@ -65,16 +83,14 @@ const versalFor = (i: number) => ["I", "II", "III", "IV", "V", "VI", "VII", "VII
     </div>
 
     <p class="ornament" aria-hidden="true">• • •</p>
-    <p class="gloss">Tanda tersimpan hanya di perangkat ini dan tidak pernah dikirim ke mana pun.</p>
+    <p class="gloss">Tanda tersimpan hanya di perangkat ini dan tidak pernah dikirim ke mana pun. Sebagai perlindungan tambahan, tanda terhapus dengan sendirinya 24 jam kemudian.</p>
     <a class="next-link" href="/tata-cara/">Lanjut · Tata Cara Pengakuan Dosa →</a>
   </main>
 
   <script>
-    const KEY = "pb-marks-v1";
-    const load = (): Record<string, 1> => {
-      try { return JSON.parse(localStorage.getItem(KEY) ?? "{}"); } catch { return {}; }
-    };
-    let marks = load();
+    import { loadMarks, saveMarks, clearMarks, audience, setAudience, type Audience } from "../lib/client/store";
+
+    let marks = loadMarks();
 
     const boxes = document.querySelectorAll<HTMLInputElement>("#exam-root .mark");
     const countEl = document.getElementById("exam-count")!;
@@ -99,17 +115,45 @@ const versalFor = (i: number) => ["I", "II", "III", "IV", "V", "VI", "VII", "VII
       b.addEventListener("change", () => {
         if (b.checked) marks[b.dataset.key!] = 1;
         else delete marks[b.dataset.key!];
-        localStorage.setItem(KEY, JSON.stringify(marks));
+        saveMarks(marks);
         render();
       })
     );
 
     document.getElementById("exam-clear")!.addEventListener("click", () => {
       marks = {};
-      localStorage.removeItem(KEY);
+      clearMarks();
       render();
     });
 
     render();
+
+    /* ---- audience filter: which printed subgroups are shown ---------- */
+    // The booklet addresses some question groups to particular states of
+    // life (Perintah IV). "Semua" shows the booklet in full.
+    const HIDE: Record<Audience, string[]> = {
+      semua: [],
+      anak: ["ortu", "atasan"],
+      ortu: ["anak"],
+    };
+    const root = document.getElementById("exam-root")!;
+    const groups = document.querySelectorAll<HTMLElement>(".exam-group[data-aud]");
+    const audBtns = document.querySelectorAll<HTMLButtonElement>("#aud-seg button");
+
+    function paintAudience() {
+      const a = audience();
+      if (a === "semua") delete root.dataset.audience;
+      else root.dataset.audience = a;
+      groups.forEach((g) => { g.hidden = HIDE[a].includes(g.dataset.aud!); });
+      audBtns.forEach((b) => b.classList.toggle("on", b.dataset.aud === a));
+    }
+
+    audBtns.forEach((b) =>
+      b.addEventListener("click", () => {
+        setAudience(b.dataset.aud as Audience);
+        paintAudience();
+      })
+    );
+    paintAudience();
   </script>
 </Base>

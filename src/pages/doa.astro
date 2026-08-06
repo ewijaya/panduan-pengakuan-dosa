@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import FlowRail from "../components/FlowRail.astro";
 import { loadBooklet } from "../lib/booklet";
 import { loadDoaTobat } from "../lib/supplement";
 
@@ -9,6 +10,7 @@ const doaTobat = loadDoaTobat();
 
 <Base title="Doa — Panduan Pengakuan Dosa" current="/doa/">
   <main class="wrap">
+    <FlowRail current="doa" />
     <p class="rubric page-kicker">Doa</p>
     <h1 class="canticle page-title">Doa Sebelum Pengakuan Dosa</h1>
 

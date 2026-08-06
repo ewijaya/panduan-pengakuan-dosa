@@ -1,0 +1,31 @@
+---
+/**
+ * The guided flow's quiet spine: Doa → Pemeriksaan Batin → Tata Cara →
+ * Selesai, following the booklet's own order (Langkah 1: "Awalilah dengan
+ * mendoakan Doa Sebelum Pengakuan Dosa"). Stations already passed are ink,
+ * the current one rubric, the rest soft — a wayfinding line, not a progress
+ * bar.
+ */
+interface Props {
+  current: "doa" | "batin" | "rite" | "selesai";
+}
+
+const STATIONS = [
+  ["doa", "/doa/", "Doa"],
+  ["batin", "/pemeriksaan-batin/", "Pemeriksaan Batin"],
+  ["rite", "/tata-cara/", "Tata Cara"],
+  ["selesai", "/selesai/", "Selesai"],
+] as const;
+
+const { current } = Astro.props;
+const idx = STATIONS.findIndex(([k]) => k === current);
+---
+
+<nav class="flow-rail" aria-label="Urutan pengakuan dosa">
+  {STATIONS.map(([k, href, label], i) => (
+    <>
+      {i > 0 && <span class="flow-sep" aria-hidden="true">·</span>}
+      <a href={href} aria-current={k === current ? "step" : undefined} class:list={{ "is-done": i < idx }}>{label}</a>
+    </>
+  ))}
+</nav>
