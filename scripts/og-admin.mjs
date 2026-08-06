@@ -38,7 +38,7 @@ const svg = `
 
   <line x1="64" y1="412" x2="640" y2="412" stroke="#2C2820" stroke-width="2"/>
 
-  <text x="64" y="456" font-family="Vollkorn" font-size="24" fill="#F4EEDE">Kunjungan halaman, tempat, dan peta pembaca —</text>
+  <text x="64" y="456" font-family="Vollkorn" font-size="24" fill="#F4EEDE">Kunjungan halaman, tempat, dan peta pembaca,</text>
   <text x="64" y="488" font-family="Vollkorn" font-size="24" fill="#F4EEDE">tanpa cookie, tanpa identitas siapa pun.</text>
 
   ${bars}
