@@ -22,7 +22,7 @@ const svg = `
   <rect x="64" y="72" width="84" height="84" rx="4" fill="#25478C" stroke="#1A3369" stroke-width="2"/>
   <text x="106" y="138" font-family="Vollkorn SC" font-size="62" fill="#F6EFDD" text-anchor="middle">T</text>
 
-  <text x="64" y="216" font-family="Jost" font-weight="600" font-size="21" letter-spacing="4" fill="#A81A1A">KEUSKUPAN SURABAYA · GRATIS</text>
+  <text x="64" y="216" font-family="Jost" font-weight="600" font-size="21" letter-spacing="4" fill="#A81A1A">KEUSKUPAN SURABAYA</text>
 
   <text x="60" y="300" font-family="Vollkorn SC" font-size="84" fill="#16130D">Sakramen</text>
   <text x="60" y="390" font-family="Vollkorn SC" font-size="84" fill="#16130D">Tobat</text>
