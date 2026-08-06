@@ -112,7 +112,7 @@ function tickerPanel(rows, error = null) {
           </div>
         </div>`
       : '<p class="empty">Belum ada kunjungan dalam 3 hari terakhir.</p>'}
-    <p class="note">Terbaru dulu, bergulir kanan ke kiri — waktu dalam WIB. Arahkan kursor untuk jeda. Lokasi perkiraan jaringan; sampling dapat menyembunyikan kunjungan bervolume sangat rendah.</p>
+    <p class="note">Terbaru dulu, bergulir kanan ke kiri, waktu dalam WIB. Arahkan kursor untuk jeda. Lokasi perkiraan jaringan; sampling dapat menyembunyikan kunjungan bervolume sangat rendah.</p>
   </section>`;
 }
 
@@ -222,12 +222,12 @@ export async function onRequestGet({ request, env }) {
   const h24 = Number(last24?.[0]?.total ?? 0);
   const avg7 = Number(sum7?.[0]?.total ?? 0) / 7;
   const health = avg7 < 1
-    ? { cls: "quiet", ic: "·", text: "Beacon baru mulai — belum cukup data untuk rata-rata 7 hari." }
+    ? { cls: "quiet", ic: "·", text: "Beacon baru mulai: belum cukup data untuk rata-rata 7 hari." }
     : h24 === 0
-      ? { cls: "bad", ic: "✕", text: `Beacon senyap — nol kunjungan dalam 24 jam terakhir (rata-rata ${num(Math.round(avg7))}/hari).` }
+      ? { cls: "bad", ic: "✕", text: `Beacon senyap: nol kunjungan dalam 24 jam terakhir (rata-rata ${num(Math.round(avg7))}/hari).` }
       : h24 < avg7 * 0.4
-        ? { cls: "warn", ic: "!", text: `Beacon menurun — hanya ${num(h24)} kunjungan dalam 24 jam, dari rata-rata ${num(Math.round(avg7))}/hari.` }
-        : { cls: "ok", ic: "✓", text: `Beacon sehat — ${num(h24)} kunjungan dalam 24 jam terakhir (rata-rata 7 hari: ${num(Math.round(avg7))}/hari).` };
+        ? { cls: "warn", ic: "!", text: `Beacon menurun: hanya ${num(h24)} kunjungan dalam 24 jam, dari rata-rata ${num(Math.round(avg7))}/hari.` }
+        : { cls: "ok", ic: "✓", text: `Beacon sehat: ${num(h24)} kunjungan dalam 24 jam terakhir (rata-rata 7 hari: ${num(Math.round(avg7))}/hari).` };
 
   /* -- newest place reached (fixed 90-day window, like hop) -- */
   const places = (arrivals ?? [])
@@ -262,7 +262,7 @@ export async function onRequestGet({ request, env }) {
         <td>${esc(p.region || "—")}</td>
         <td>${esc(wibStamp(p.first))}</td>
         <td class="n">${num(p.total)}</td></tr>`).join("")}</tbody></table>
-      <p class="note">Jendela tetap 90 hari (seluruh ingatan Analytics Engine), apa pun filter di atas — tempat "baru" berarti tanpa kunjungan lebih awal dalam jendela itu. Hitungan tersampel; tempat bervolume sangat rendah bisa terhitung kurang.</p>
+      <p class="note">Jendela tetap 90 hari (seluruh ingatan Analytics Engine), apa pun filter di atas; tempat "baru" berarti tanpa kunjungan lebih awal dalam jendela itu. Hitungan tersampel; tempat bervolume sangat rendah bisa terhitung kurang.</p>
     </section>`;
   }
 
@@ -296,12 +296,12 @@ export async function onRequestGet({ request, env }) {
   </details>`;
   const visitorPanel = `<section class="card">
     <h2>Tempat pembaca</h2>
-    <p class="note">Menurut negara — pilih negara untuk kota dan wilayahnya. Tempat bervolume rendah bisa terhitung kurang karena sampling.</p>
+    <p class="note">Menurut negara; pilih negara untuk kota dan wilayahnya. Tempat bervolume rendah bisa terhitung kurang karena sampling.</p>
     ${countriesArr.length
       ? (extraC
         ? `<input type="checkbox" id="xt-places" class="xtoggle">
            <div class="vclist">${countriesArr.map(vcRow).join("")}</div>
-           <p class="empty xmore"><label for="xt-places"><span class="more">…dan ${extraC} lagi — tampilkan semua</span><span class="less">tampilkan lebih sedikit</span></label></p>`
+           <p class="empty xmore"><label for="xt-places"><span class="more">…dan ${extraC} lagi: tampilkan semua</span><span class="less">tampilkan lebih sedikit</span></label></p>`
         : `<div class="vclist">${countriesArr.map(vcRow).join("")}</div>`)
       : '<p class="empty">Belum ada data pada jendela ini.</p>'}
   </section>`;
@@ -320,7 +320,7 @@ export async function onRequestGet({ request, env }) {
     const sum = entries.reduce((s, [, n]) => s + n, 0);
     if (!sum) return '<p class="empty">Belum ada data.</p>';
     return `<div class="sbar">${entries.map(([k, n], i) =>
-      `<span class="sseg c${i % 5}" style="flex:${n}" title="${esc(k)} — ${num(n)}">${n / sum >= 0.14 ? `${Math.round((n / sum) * 100)}%` : ""}</span>`).join("")}</div>
+      `<span class="sseg c${i % 5}" style="flex:${n}" title="${esc(k)}: ${num(n)}">${n / sum >= 0.14 ? `${Math.round((n / sum) * 100)}%` : ""}</span>`).join("")}</div>
       <div class="slegend">${entries.map(([k, n], i) => `<span><i class="sw c${i % 5}"></i>${esc(k)} ${num(n)}</span>`).join(" ")}</div>`;
   };
 
@@ -357,17 +357,17 @@ export async function onRequestGet({ request, env }) {
     <div class="tile"><div class="lbl">Negara, sepanjang waktu</div><div class="val">${num(allCountries.size)}</div><div class="sub">gabungan arsip + jendela live</div></div>
     <div class="tile"><div class="lbl">Pekan terarsip</div><div class="val">${num(weeks.length)}</div><div class="sub">rollup KV, tak pernah kedaluwarsa</div></div>
   </div>
-  ${allPaths.length ? `<section class="card"><h2>Halaman teratas — sepanjang waktu</h2>
+  ${allPaths.length ? `<section class="card"><h2>Halaman teratas · sepanjang waktu</h2>
     <table><thead><tr><th>Halaman</th><th class="n">Kunjungan</th></tr></thead>
     <tbody>${allPaths.map(([p, n]) => `<tr><td><span title="${esc(p)}">${esc(pageName(p))}</span></td><td class="n">${num(n)}</td></tr>`).join("")}</tbody></table>
-    <p class="note">Dijumlah dari 5 halaman teratas tiap rollup mingguan — sinyal kuat, bukan peringkat persis ekor panjang.</p>
+    <p class="note">Dijumlah dari 5 halaman teratas tiap rollup mingguan; sinyal kuat, bukan peringkat persis ekor panjang.</p>
   </section>` : ""}`;
   }
 
   // Weekly history card — always present so the archive's state is visible.
   const weeklyCard = !store
     ? `<section class="card"><h2>Arsip mingguan (tak lekang)</h2>
-        <p class="empty">Belum aktif — tambahkan binding KV <code>PDP_STORE</code> → namespace <code>pdp_analytics_store</code> pada proyek Pages (Settings → Bindings), lalu buat deployment baru.</p></section>`
+        <p class="empty">Belum aktif: tambahkan binding KV <code>PDP_STORE</code> → namespace <code>pdp_analytics_store</code> pada proyek Pages (Settings → Bindings), lalu buat deployment baru.</p></section>`
     : kvError
       ? `<section class="card"><h2>Arsip mingguan (tak lekang)</h2><p class="empty">KV gagal dibaca: ${esc(kvError)}</p></section>`
       : weeks.length
@@ -385,10 +385,10 @@ export async function onRequestGet({ request, env }) {
                 <td class="n">${num(w.byEvent?.pwa ?? 0)}</td>
                 <td>${esc(pageName(w.topPaths?.[0]?.[0] ?? "") || "—")}</td></tr>`).join("")}
             </tbody></table>
-            ${!allTime && weeks.length > 12 ? `<p class="empty">…dan ${num(weeks.length - 12)} pekan lebih awal — <a href="/admin?days=all">lihat semua</a>, atau pilih pekan untuk rinciannya.</p>` : ""}
+            ${!allTime && weeks.length > 12 ? `<p class="empty">…dan ${num(weeks.length - 12)} pekan lebih awal: <a href="/admin?days=all">lihat semua</a>, atau pilih pekan untuk rinciannya.</p>` : ""}
           </section>`
         : `<section class="card"><h2>Arsip mingguan (tak lekang)</h2>
-            <p class="empty">Binding aktif, belum ada rollup — cron menulis tiap Minggu 20.00 UTC (Senin 03.00 WIB). Sampai itu, jendela live 7/30/90 hari di atas mencakup semuanya.</p></section>`;
+            <p class="empty">Binding aktif, belum ada rollup; cron menulis tiap Minggu 20.00 UTC (Senin 03.00 WIB). Sampai itu, jendela live 7/30/90 hari di atas mencakup semuanya.</p></section>`;
 
   /* -- visit sources: browser vs installed app, plus Android installs -- */
   const SOURCE_LABELS = { view: "peramban", pwa: "aplikasi terpasang" };
@@ -405,7 +405,7 @@ export async function onRequestGet({ request, env }) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Admin · Panduan Pengakuan Dosa</title>
-<meta name="description" content="Dasbor agregat anonim — Panduan Pengakuan Dosa.">
+<meta name="description" content="Dasbor agregat anonim · Panduan Pengakuan Dosa.">
 <link rel="icon" href="/admin-favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Admin · Panduan Pengakuan Dosa">
 <meta property="og:description" content="Dasbor agregat anonim: kunjungan halaman, tempat, dan peta pembaca.">
@@ -628,7 +628,7 @@ export async function onRequestGet({ request, env }) {
   <header>
     <div class="cross">✠</div>
     <h1><a href="/">Panduan Pengakuan Dosa</a> · Analitik</h1>
-    <p>${allTime ? "sepanjang waktu — panel live dibatasi 90 hari" : `jendela live: ${days} hari terakhir`} · waktu dalam WIB · <a href="/">ke situs</a></p>
+    <p>${allTime ? "sepanjang waktu (panel live dibatasi 90 hari)" : `jendela live: ${days} hari terakhir`} · waktu dalam WIB · <a href="/">ke situs</a></p>
   </header>
 
   <nav class="filters">${ranges.map(([v, label]) =>
@@ -655,16 +655,16 @@ export async function onRequestGet({ request, env }) {
   ${newestPanel}
 
   <section class="card">
-    <h2>Peta pembaca — ${num(points.length)} tempat, ${days} hari terakhir</h2>
+    <h2>Peta pembaca · ${num(points.length)} tempat, ${days} hari terakhir</h2>
     ${points.length
       ? `<div id="map" class="map" role="region" aria-label="Peta interaktif kota pembaca"></div>
          <script type="application/json" id="map-data">${mapData}</script>`
-      : '<p class="empty">Belum ada titik — koordinat baru dicatat sejak fitur peta dipasang; kunjungan lama hanya tampil pada panel Tempat.</p>'}
-    <p class="note">Gulir/cubit untuk zoom, seret untuk geser; pilih lingkaran untuk tempat dan jumlahnya. Titik adalah sentroid kota dari jaringan Cloudflare — bukan lokasi persis siapa pun.</p>
+      : '<p class="empty">Belum ada titik: koordinat baru dicatat sejak fitur peta dipasang; kunjungan lama hanya tampil pada panel Tempat.</p>'}
+    <p class="note">Gulir/cubit untuk zoom, seret untuk geser; pilih lingkaran untuk tempat dan jumlahnya. Titik adalah sentroid kota dari jaringan Cloudflare, bukan lokasi persis siapa pun.</p>
   </section>
 
   <section class="card">
-    <h2>Kunjungan per hari — ${chartDays} hari terakhir</h2>
+    <h2>Kunjungan per hari · ${chartDays} hari terakhir</h2>
     <div class="chart">
       ${[0.25, 0.5, 0.75].map((f) => `<div class="grid-line" style="bottom:${f * 100}%"></div>`).join("")}
       ${byDay.map((r) => {
@@ -687,20 +687,20 @@ export async function onRequestGet({ request, env }) {
   </div>
 
   <section class="card">
-    <h2>Pembaca — ${days} hari</h2>
+    <h2>Pembaca · ${days} hari</h2>
     <div class="shares">
       <div class="share"><h3>Sumber kunjungan</h3>${shareRow(sources)}</div>
       <div class="share"><h3>Perangkat</h3>${shareRow(byDevice)}</div>
       <div class="share"><h3>Bahasa peramban</h3>${shareRow(byLang)}</div>
     </div>
     <p class="note">"Aplikasi terpasang" = dibuka dari ikon layar utama (terdeteksi di iPhone maupun Android).
-      Pemasangan tercatat: ${num(installs)} — momen pemasangan hanya dapat dideteksi di Android; iPhone tidak pernah mengumumkannya, jadi angka sebenarnya lebih tinggi.</p>
+      Pemasangan tercatat: ${num(installs)}; momen pemasangan hanya dapat dideteksi di Android; iPhone tidak pernah mengumumkannya, jadi angka sebenarnya lebih tinggi.</p>
   </section>
 
   ${weeklyCard}
 
   <footer><span class="cross">✠</span> Dibuat ${esc(wibStamp(new Date(Date.now()).toISOString().slice(0, 19).replace("T", " ")))} WIB ·
-    beacon menghitung kunjungan halaman saja — tanpa cookie, tanpa identitas; tanda pemeriksaan batin tidak pernah meninggalkan perangkat pembaca.<br>
+    beacon menghitung kunjungan halaman saja, tanpa cookie, tanpa identitas; tanda pemeriksaan batin tidak pernah meninggalkan perangkat pembaca.<br>
     Analytics Engine menyimpan ±90 hari; arsip mingguan KV menyimpan selamanya · sejak ${esc(prettyDay(`${weeks[0]?.start ?? LAUNCH_DAY} 00:00:00`))}</footer>
 </div>
 <script>
@@ -848,7 +848,7 @@ function weekPage(week, rollup) {
           const [city, country] = k.split("|");
           return [`${flagOf(country)}${esc(city)}, ${esc(countryName(country))}`, n];
         }))}
-      <footer><span class="cross">✠</span> Rollup KV permanen — tetap ada setelah jendela ±90 hari Analytics Engine berlalu.</footer>`;
+      <footer><span class="cross">✠</span> Rollup KV permanen, tetap ada setelah jendela ±90 hari Analytics Engine berlalu.</footer>`;
 
   const html = `<!doctype html>
 <html lang="id"><head>

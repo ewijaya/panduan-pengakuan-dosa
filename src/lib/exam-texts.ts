@@ -12,7 +12,7 @@ export function examTextsJson(bk: Booklet): string {
   bk.pemeriksaanBatin.sections.forEach((sec) =>
     sec.groups.forEach((g, gi) =>
       g.questions.forEach((q, qi) => {
-        texts[`${sec.id}:${gi}:${qi}`] = { s: g.label ? `${sec.label} — ${g.label}` : sec.label, q };
+        texts[`${sec.id}:${gi}:${qi}`] = { s: g.label ? `${sec.label} · ${g.label}` : sec.label, q };
       })
     )
   );

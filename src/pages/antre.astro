@@ -23,7 +23,7 @@ const confessIdx = steps.findIndex((st) => st.umat.some((p) => p.text.includes("
 if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[antre] rite anchor steps not found");
 ---
 
-<Base title="Mode Antre — Tata Cara Pengakuan Dosa" current="/tata-cara/" minimal>
+<Base title="Mode Antre · Tata Cara Pengakuan Dosa" current="/tata-cara/" minimal>
   <main class="wrap antre">
     <div class="antre-top">
       <a class="gloss" href="/tata-cara/">← Keluar dari Mode Antre</a>
@@ -56,7 +56,7 @@ if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[antre] rite ancho
               {i === lastConfIdx && <p class="gloss" id="last-ago" hidden></p>}
               {i === confessIdx && (
                 <details class="catatan" id="catatan" hidden>
-                  <summary class="rubric">Catatanku — tanda pemeriksaan batin</summary>
+                  <summary class="rubric">Catatanku: tanda pemeriksaan batin</summary>
                   <ul id="catatan-list"></ul>
                   <p class="gloss">Hanya tersimpan di perangkat ini; terhapus otomatis setelah 24 jam.</p>
                 </details>

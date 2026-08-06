@@ -11,7 +11,7 @@ interface Props {
   minimal?: boolean;
 }
 
-const { title, description = "Panduan Sakramen Tobat (Pengakuan Dosa) — Keuskupan Surabaya.", current = "", minimal = false } = Astro.props;
+const { title, description = "Panduan Sakramen Tobat (Pengakuan Dosa) dari Keuskupan Surabaya.", current = "", minimal = false } = Astro.props;
 
 // The brand is the home link (universal convention), so no "Beranda" item;
 // the explainer is "Pengantar", matching its card on the home page — a nav
@@ -38,7 +38,7 @@ const MORE = [
   ["/sakramen-tobat/", "Apa itu Sakramen Tobat"],
   ["/lima-langkah/", "Lima Langkah"],
   ["/antre/", "Mode Antre"],
-  ["/selesai/", "Selesai — Penitensi"],
+  ["/selesai/", "Selesai · Penitensi"],
   ["/tentang/", "Tentang"],
 ] as const;
 ---
@@ -123,7 +123,7 @@ const MORE = [
         <span>Jaga layar menyala</span>
         <span class="seg"><button type="button" id="wake-btn" aria-pressed="false">Mati</button></span>
       </div>
-      <p class="vnote">Seluruh panduan tersimpan di perangkat ini — tetap dapat dibuka tanpa koneksi.</p>
+      <p class="vnote">Seluruh panduan tersimpan di perangkat ini dan tetap dapat dibuka tanpa koneksi.</p>
     </dialog>
 
     <slot />

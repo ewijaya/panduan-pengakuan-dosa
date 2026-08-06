@@ -20,7 +20,7 @@ const confessIdx = steps.findIndex((st) => st.umat.some((p) => p.text.includes("
 if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[tata-cara] rite anchor steps not found");
 ---
 
-<Base title="Tata Cara Pengakuan Dosa — Panduan Pengakuan Dosa" current="/tata-cara/">
+<Base title="Tata Cara Pengakuan Dosa · Panduan Pengakuan Dosa" current="/tata-cara/">
   <main class="wrap">
     <FlowRail current="rite" />
     <p class="rubric page-kicker">Tata Cara</p>
@@ -41,7 +41,7 @@ if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[tata-cara] rite a
       <button class="btn btn--quiet" id="rite-toggle-all" type="button">Tampilkan semua</button>
       <a class="btn btn--quiet" href="/antre/" style="text-decoration: none;">Mode Antre</a>
     </div>
-    <p class="gloss" style="margin-bottom: calc(var(--space) * 3);">Mode Antre: satu langkah per layar dengan huruf besar — untuk dibaca sambil menunggu giliran.</p>
+    <p class="gloss" style="margin-bottom: calc(var(--space) * 3);">Mode Antre: satu langkah per layar dengan huruf besar, untuk dibaca sambil menunggu giliran.</p>
     <div class="gathering" id="rite-gathering" aria-hidden="true">
       {steps.map(() => <i></i>)}
     </div>
@@ -69,7 +69,7 @@ if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[tata-cara] rite a
               {i === lastConfIdx && <p class="gloss" id="last-ago" hidden></p>}
               {i === confessIdx && (
                 <details class="catatan" id="catatan" hidden>
-                  <summary class="rubric">Catatanku — tanda pemeriksaan batin</summary>
+                  <summary class="rubric">Catatanku: tanda pemeriksaan batin</summary>
                   <ul id="catatan-list"></ul>
                   <p class="gloss">Hanya tersimpan di perangkat ini; terhapus otomatis setelah 24 jam.</p>
                 </details>
@@ -99,7 +99,7 @@ if (lastConfIdx === -1 || confessIdx === -1) throw new Error("[tata-cara] rite a
       <p class="rubric">Selesai</p>
       <p class="lectio">Segera setelah keluar dari Ruang Pengakuan Dosa, lakukanlah Penitensimu, dan pergilah dalam damai, serta jangan berbuat dosa lagi.</p>
     </section>
-    <a class="next-link" href="/selesai/">Lanjut · Selesai — Penitensi &amp; Doa Tobat →</a>
+    <a class="next-link" href="/selesai/">Lanjut · Selesai: Penitensi &amp; Doa Tobat →</a>
   </main>
 
   <script is:inline type="application/json" id="exam-texts" set:html={examTextsJson(b)} />

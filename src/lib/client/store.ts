@@ -156,7 +156,7 @@ export function seasonalNudge(last: number | null, now: Date = new Date()): stri
   for (const [name, d] of targets) {
     const days = Math.floor((d.getTime() - now.getTime()) / DAY);
     if (days >= 0 && days <= 21) {
-      return `Menjelang ${name} — waktu yang baik untuk menerima Sakramen Tobat.`;
+      return `Menjelang ${name}, waktu yang baik untuk menerima Sakramen Tobat.`;
     }
   }
   return null;
