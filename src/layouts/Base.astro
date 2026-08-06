@@ -1,7 +1,6 @@
 ---
 import "../../assets/styles/sarum.css";
 import "../styles/app.css";
-import { loadBooklet } from "../lib/booklet";
 
 interface Props {
   title: string;
@@ -13,7 +12,6 @@ interface Props {
 }
 
 const { title, description = "Panduan Sakramen Tobat (Pengakuan Dosa) — Keuskupan Surabaya.", current = "", minimal = false } = Astro.props;
-const b = loadBooklet();
 
 const NAV = [
   ["/", "Beranda"],
@@ -132,7 +130,7 @@ const MORE = [
       <>
       <footer class="site-footer">
         <div class="wrap">
-          <p class="gloss">Keuskupan Surabaya · Penyunting: {b.credits.penyunting} · <a href="/tentang/">Kolofon</a></p>
+          <p class="gloss"><a href="/tentang/">Kolofon</a></p>
         </div>
       </footer>
 
