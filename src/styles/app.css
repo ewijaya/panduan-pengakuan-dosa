@@ -1,0 +1,303 @@
+/* App-level composition on top of the Sarum Vellum tokens (assets/styles/sarum.css).
+   Components only reference tokens — never raw colors — so both modes just work. */
+
+* { box-sizing: border-box; }
+
+.wrap {
+  max-width: 44rem;
+  margin-inline: auto;
+  padding-inline: calc(var(--space) * 4);
+}
+
+/* ---- header ------------------------------------------------------- */
+
+.site-header {
+  border-bottom: var(--rule-w) solid var(--edge);
+  background: var(--leaf);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.site-header .bar {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space) * 3);
+  padding-block: calc(var(--space) * 2.5);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: var(--track-display);
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand .versal-mini {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5em;
+  text-align: center;
+  background: var(--versal);
+  color: var(--versal-ink);
+  border: 1px solid var(--versal-edge);
+  border-radius: 2px;
+  margin-right: 0.45em;
+}
+
+.site-nav {
+  display: flex;
+  gap: calc(var(--space) * 1.5);
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-left: auto;
+}
+.site-nav::-webkit-scrollbar { display: none; }
+
+.site-nav a {
+  font-family: var(--font-ui);
+  font-size: var(--text-rubric);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: calc(var(--space) * 1.5) calc(var(--space) * 2);
+  border-radius: var(--radius);
+  white-space: nowrap;
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--rubric);
+  font-weight: 600;
+}
+
+/* ---- hero (image-backed: fixed light ink over the dark painting) --- */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-bottom: var(--rule-w) solid var(--edge);
+  background: #14100c;
+}
+
+.hero img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%;
+  opacity: 0.9;
+}
+
+.hero .scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 8, 5, 0.88) 0%, rgba(10, 8, 5, 0.45) 45%, rgba(10, 8, 5, 0.25) 100%);
+}
+
+.hero .hero-inner {
+  position: relative;
+  padding-block: clamp(7rem, 24vw, 12rem) calc(var(--space) * 8);
+  color: #f4eede;
+}
+
+.hero .kicker {
+  font-family: var(--font-ui);
+  font-size: var(--text-rubric);
+  font-weight: 600;
+  letter-spacing: var(--track-rubric);
+  text-transform: uppercase;
+  color: #e0c9a0;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-canticle);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  margin: calc(var(--space) * 2) 0 0;
+}
+
+.hero .sub {
+  font-family: var(--font-display);
+  font-size: var(--text-incipit);
+  margin: calc(var(--space) * 1) 0 0;
+  color: #e8dfc8;
+}
+
+.hero .penyunting {
+  margin-top: calc(var(--space) * 5);
+  font-family: var(--font-ui);
+  font-size: var(--text-rubric);
+  letter-spacing: 0.06em;
+  color: #d9cdb2;
+}
+.hero .penyunting strong {
+  display: block;
+  font-family: var(--font-text);
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  color: #f4eede;
+  margin-top: calc(var(--space) * 1);
+}
+
+/* ---- generic page scaffolding ------------------------------------- */
+
+main.wrap { padding-block: calc(var(--space) * 8) calc(var(--space) * 12); }
+
+.page-title { margin: 0 0 calc(var(--space) * 2); }
+.page-kicker { margin-bottom: calc(var(--space) * 2); }
+
+.stack > * + * { margin-top: calc(var(--space) * 5); }
+
+.folio + .folio { margin-top: calc(var(--space) * 5); }
+
+.folio h2, .folio h3 { margin-top: 0; }
+
+p { margin: 0; }
+p + p { margin-top: calc(var(--space) * 3); }
+
+/* ---- home cards ---------------------------------------------------- */
+
+.cards {
+  display: grid;
+  gap: calc(var(--space) * 3);
+  margin-top: calc(var(--space) * 6);
+}
+
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.card-link .folio { transition: border-color 120ms ease; }
+.card-link:hover .folio { border-color: var(--rubric); }
+
+.card-link .rubric { margin-bottom: calc(var(--space) * 1.5); }
+.card-link .desc { color: var(--ink-soft); margin-top: calc(var(--space) * 1.5); }
+
+/* ---- examination --------------------------------------------------- */
+
+.exam-controls {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space) * 3);
+  flex-wrap: wrap;
+  margin-block: calc(var(--space) * 4);
+}
+
+.exam-count { min-width: 6ch; }
+
+.exam-quote {
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: calc(var(--space) * 1) 0 calc(var(--space) * 3);
+}
+
+.exam-group-label { margin: calc(var(--space) * 4) 0 calc(var(--space) * 2); }
+
+.exam-row {
+  display: flex;
+  gap: calc(var(--space) * 3);
+  align-items: flex-start;
+  padding-block: calc(var(--space) * 3);
+  cursor: pointer;
+}
+
+.exam-row .mark { margin-top: 0.3em; }
+
+.exam-row input:checked ~ span { color: var(--ink); }
+
+.gathering { margin-block: calc(var(--space) * 2) calc(var(--space) * 6); }
+
+/* ---- prayer --------------------------------------------------------- */
+
+.prayer-lines { text-align: left; }
+.prayer-lines .amen { font-weight: 600; }
+
+/* ---- rite (tata cara) ---------------------------------------------- */
+
+.rite-step { display: none; }
+.rite-step.is-current { display: block; }
+.rite-all .rite-step { display: block; }
+
+.rite-voice { margin-top: calc(var(--space) * 4); }
+.rite-voice:first-of-type { margin-top: calc(var(--space) * 2); }
+
+.rite-speech {
+  font-family: var(--font-text);
+  font-style: italic;
+  font-size: var(--text-incipit);
+  line-height: 1.5;
+  margin-top: calc(var(--space) * 2);
+}
+
+.rite-action {
+  color: var(--ink-soft);
+  margin-top: calc(var(--space) * 2);
+}
+
+.rite-note {
+  font-family: var(--font-ui);
+  font-size: var(--text-gloss);
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  margin-top: calc(var(--space) * 2);
+}
+
+.rite-controls {
+  display: flex;
+  gap: calc(var(--space) * 3);
+  align-items: center;
+  margin-top: calc(var(--space) * 5);
+}
+.rite-controls .spacer { flex: 1; }
+
+/* ---- footer --------------------------------------------------------- */
+
+.site-footer {
+  border-top: var(--rule-w) solid var(--edge);
+  background: var(--leaf);
+  padding-block: calc(var(--space) * 6);
+  margin-top: calc(var(--space) * 10);
+}
+.site-footer .gloss + .gloss { margin-top: calc(var(--space) * 2); }
+
+/* ---- misc ----------------------------------------------------------- */
+
+.next-link {
+  display: inline-block;
+  margin-top: calc(var(--space) * 7);
+  font-family: var(--font-ui);
+  font-size: var(--text-rubric);
+  font-weight: 600;
+  letter-spacing: var(--track-rubric);
+  text-transform: uppercase;
+  color: var(--rubric);
+  text-decoration: none;
+}
+
+.ornament {
+  text-align: center;
+  color: var(--ink-soft);
+  letter-spacing: 0.6em;
+  margin-block: calc(var(--space) * 6);
+}
+
+a { color: var(--rubric); }
+
+.theme-toggle {
+  border: var(--rule-w) solid var(--edge);
+  background: transparent;
+  color: var(--ink-soft);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: var(--text-gloss);
+  padding: calc(var(--space) * 1.5) calc(var(--space) * 2);
+  cursor: pointer;
+  white-space: nowrap;
+}

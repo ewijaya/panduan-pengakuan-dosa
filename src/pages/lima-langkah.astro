@@ -1,0 +1,35 @@
+---
+import Base from "../layouts/Base.astro";
+import { loadBooklet, inlineMd } from "../lib/booklet";
+
+const b = loadBooklet();
+
+/** Where each step leads in the app */
+const STEP_LINKS: Record<number, [string, string]> = {
+  1: ["/pemeriksaan-batin/", "Buka Pemeriksaan Batin"],
+  4: ["/tata-cara/", "Buka Tata Cara Pengakuan Dosa"],
+};
+---
+
+<Base title="Lima Langkah untuk Pengakuan Dosa yang Baik — Panduan Pengakuan Dosa" current="/lima-langkah/">
+  <main class="wrap">
+    <p class="rubric page-kicker">Lima langkah untuk menjalankan</p>
+    <h1 class="canticle page-title">Pengakuan Dosa yang Baik</h1>
+
+    <div class="stack">
+      {b.limaLangkah.steps.map((s) => (
+        <section class="folio">
+          <h2 class="incipit"><span class="versal" aria-hidden="true">{s.n}</span>{s.title}</h2>
+          <div class="quire">
+            {s.points.map((p) => (
+              <p class="lectio" style="padding-block: calc(var(--space) * 2);" set:html={inlineMd(p)} />
+            ))}
+          </div>
+          {STEP_LINKS[s.n] && <a class="next-link" href={STEP_LINKS[s.n][0]}>{STEP_LINKS[s.n][1]} →</a>}
+        </section>
+      ))}
+    </div>
+
+    <a class="next-link" href="/doa/">Lanjut · Doa Sebelum Pengakuan Dosa →</a>
+  </main>
+</Base>

@@ -1,0 +1,86 @@
+---
+import "../../assets/styles/sarum.css";
+import "../styles/app.css";
+import { loadBooklet } from "../lib/booklet";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** current nav path, e.g. "/doa/" */
+  current?: string;
+}
+
+const { title, description = "Panduan Sakramen Tobat (Pengakuan Dosa) — Keuskupan Surabaya.", current = "" } = Astro.props;
+const b = loadBooklet();
+
+const NAV = [
+  ["/", "Beranda"],
+  ["/sakramen-tobat/", "Sakramen Tobat"],
+  ["/lima-langkah/", "Lima Langkah"],
+  ["/doa/", "Doa"],
+  ["/pemeriksaan-batin/", "Pemeriksaan Batin"],
+  ["/tata-cara/", "Tata Cara"],
+  ["/tentang/", "Tentang"],
+] as const;
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#F9F5EA" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#100E0A" media="(prefers-color-scheme: dark)" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL("/og-1200x630.jpg", Astro.site)} />
+    <script is:inline>
+      // Apply saved theme before paint (auto → follows OS).
+      const t = localStorage.getItem("theme");
+      if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a class="brand" href="/"><span class="versal-mini" aria-hidden="true">T</span>Sakramen Tobat</a>
+        <nav class="site-nav" aria-label="Navigasi">
+          {NAV.map(([href, label]) => (
+            <a href={href} aria-current={href === current ? "page" : undefined}>{label}</a>
+          ))}
+        </nav>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Ganti tema">◐</button>
+      </div>
+    </header>
+
+    <slot />
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p class="gloss">{b.credits.publisher[0]}</p>
+        <p class="gloss"><strong>Penyunting:</strong> {b.credits.penyunting}</p>
+        <p class="gloss">Lukisan: <em>La confessione</em> (1838), Giuseppe Molteni — Gallerie d'Italia, Milano. Foto: Artgate Fondazione Cariplo (domain publik).</p>
+        <p class="gloss">Semua tanda pemeriksaan batin tersimpan hanya di perangkat Anda — tanpa akun, tanpa server, tanpa pelacakan.</p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      // Theme toggle: auto → light → dark → auto
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        const cur = localStorage.getItem("theme");
+        const next = cur === "light" ? "dark" : cur === "dark" ? null : "light";
+        if (next) localStorage.setItem("theme", next);
+        else localStorage.removeItem("theme");
+        if (next) document.documentElement.dataset.theme = next;
+        else delete document.documentElement.dataset.theme;
+      });
+      // Offline support
+      if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
+    </script>
+  </body>
+</html>

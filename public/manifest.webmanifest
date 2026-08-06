@@ -1,0 +1,14 @@
+{
+  "name": "Panduan Pengakuan Dosa — Sakramen Tobat",
+  "short_name": "Pengakuan Dosa",
+  "description": "Panduan Sakramen Tobat (Pengakuan Dosa) — Keuskupan Surabaya",
+  "lang": "id",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F9F5EA",
+  "theme_color": "#F9F5EA",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

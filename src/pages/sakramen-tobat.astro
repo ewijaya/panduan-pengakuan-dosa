@@ -1,0 +1,26 @@
+---
+import Base from "../layouts/Base.astro";
+import { loadBooklet, inlineMd } from "../lib/booklet";
+
+const b = loadBooklet();
+---
+
+<Base title="Apa itu Sakramen Tobat — Panduan Pengakuan Dosa" current="/sakramen-tobat/">
+  <main class="wrap">
+    <p class="rubric page-kicker">{b.intro.kicker}</p>
+    <h1 class="canticle page-title">{b.intro.title} <span class="lectio">{b.intro.subtitle}</span></h1>
+
+    <div class="stack">
+      {b.intro.sections.map((s) => (
+        <section class="folio">
+          <h2 class="incipit">{s.heading}</h2>
+          {s.paragraphs.map((p) => (
+            <p class="lectio" set:html={inlineMd(p)} />
+          ))}
+        </section>
+      ))}
+    </div>
+
+    <a class="next-link" href="/lima-langkah/">Lanjut · Lima Langkah →</a>
+  </main>
+</Base>

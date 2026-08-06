@@ -1,0 +1,48 @@
+---
+import Base from "../layouts/Base.astro";
+import { Image } from "astro:assets";
+import painting from "../../assets/artwork/la-confessione-molteni.jpg";
+import { loadBooklet } from "../lib/booklet";
+
+const b = loadBooklet();
+
+const CARDS = [
+  ["/sakramen-tobat/", "Pengantar", "Apa itu Sakramen Tobat", "Beberapa hal yang perlu kita ketahui dari Sakramen Tobat (Pengakuan Dosa)."],
+  ["/lima-langkah/", "Panduan", "Lima Langkah", "Lima langkah untuk menjalankan Pengakuan Dosa yang baik."],
+  ["/doa/", "Doa", "Doa Sebelum Pengakuan Dosa", "Mohonlah penerangan kepada Roh Kudus sebelum memeriksa batin."],
+  ["/pemeriksaan-batin/", "Periksa Batin", "Pemeriksaan Batin", "Sepuluh Perintah Allah dan Kelima Perintah Gereja, dengan tanda yang tersimpan hanya di perangkat Anda."],
+  ["/tata-cara/", "Tata Cara", "Tata Cara Pengakuan Dosa", "Dialog antara Umat dan Imam, langkah demi langkah."],
+] as const;
+---
+
+<Base title="Sakramen Tobat (Pengakuan Dosa) — Panduan" current="/">
+  <section class="hero">
+    <Image src={painting} alt="Lukisan La confessione karya Giuseppe Molteni: seorang perempuan berlutut di ruang pengakuan dosa" widths={[480, 828, 1295]} sizes="100vw" loading="eager" />
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <p class="kicker">Keuskupan Surabaya · Diedarkan Secara Terbuka</p>
+      <h1>{b.cover.title}</h1>
+      <p class="sub">{b.cover.subtitle}</p>
+      <p class="penyunting">Penyunting<strong>{b.credits.penyunting}</strong></p>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <div class="folio">
+      <p class="rubric">Privasi</p>
+      <p>Panduan ini berjalan sepenuhnya di perangkat Anda. Tanda apa pun yang Anda buat pada Pemeriksaan Batin <strong>tersimpan hanya di perangkat ini</strong> — tanpa akun, tanpa server, tanpa pelacakan — dan dapat dihapus kapan saja dengan satu tombol.</p>
+    </div>
+
+    <div class="cards">
+      {CARDS.map(([href, rubric, title, desc]) => (
+        <a class="card-link" href={href}>
+          <div class="folio">
+            <p class="rubric">{rubric}</p>
+            <h2 class="incipit">{title}</h2>
+            <p class="desc lectio">{desc}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</Base>

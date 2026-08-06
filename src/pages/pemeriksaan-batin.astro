@@ -1,0 +1,115 @@
+---
+import Base from "../layouts/Base.astro";
+import { loadBooklet } from "../lib/booklet";
+
+const b = loadBooklet();
+const pb = b.pemeriksaanBatin;
+const versalFor = (i: number) => ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][i];
+---
+
+<Base title="Pemeriksaan Batin — Panduan Pengakuan Dosa" current="/pemeriksaan-batin/">
+  <main class="wrap">
+    <p class="rubric page-kicker">Pemeriksaan Batin</p>
+    <h1 class="canticle page-title">Pemeriksaan Batin</h1>
+    <p class="exam-quote lectio"><em>{pb.epigraph}</em></p>
+
+    <div class="exam-controls">
+      <span class="gloss exam-count" id="exam-count" aria-live="polite">0 tanda</span>
+      <button class="btn btn--quiet" id="exam-clear" type="button">Hapus semua tanda</button>
+    </div>
+    <div class="gathering" id="exam-gathering" aria-hidden="true">
+      {pb.sections.map(() => <i></i>)}
+      <i></i>
+    </div>
+
+    <div class="stack" id="exam-root">
+      {pb.sections.map((s, si) => (
+        <section class="folio" data-section={s.id}>
+          <h2 class="incipit"><span class="versal" aria-hidden="true">{versalFor(si)}</span>{s.label}</h2>
+          {s.quote && <p class="exam-quote"><em>"{s.quote}"</em></p>}
+          {s.groups.map((g, gi) => (
+            <>
+              {g.label && <p class="rubric exam-group-label">{g.label}</p>}
+              <div class="quire">
+                {g.questions.map((q, qi) => (
+                  <label class="exam-row">
+                    <input class="mark" type="checkbox" data-key={`${s.id}:${gi}:${qi}`} />
+                    <span class="lectio lectio--soft">{q}</span>
+                  </label>
+                ))}
+              </div>
+            </>
+          ))}
+        </section>
+      ))}
+
+      <section class="folio" data-section="perintah-gereja">
+        <h2 class="incipit"><span class="versal" aria-hidden="true">G</span>Kelima Perintah Gereja</h2>
+        <p class="exam-quote"><em>{pb.perintahGereja.epigraph}</em></p>
+        <div class="quire">
+          {pb.perintahGereja.items.map((q, qi) => (
+            <label class="exam-row">
+              <input class="mark" type="checkbox" data-key={`perintah-gereja:0:${qi}`} />
+              <span class="lectio lectio--soft">{q}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit"><span class="versal" aria-hidden="true">D</span>Ketujuh Dosa Pokok</h2>
+        <p class="exam-quote"><em>{pb.dosaPokok.epigraph}</em></p>
+        <p class="rubric exam-group-label">{pb.dosaPokok.lead}</p>
+        <p class="lectio">{pb.dosaPokok.body}</p>
+      </section>
+    </div>
+
+    <p class="ornament" aria-hidden="true">• • •</p>
+    <p class="gloss">Tanda tersimpan hanya di perangkat ini dan tidak pernah dikirim ke mana pun.</p>
+    <a class="next-link" href="/tata-cara/">Lanjut · Tata Cara Pengakuan Dosa →</a>
+  </main>
+
+  <script>
+    const KEY = "pb-marks-v1";
+    const load = (): Record<string, 1> => {
+      try { return JSON.parse(localStorage.getItem(KEY) ?? "{}"); } catch { return {}; }
+    };
+    let marks = load();
+
+    const boxes = document.querySelectorAll<HTMLInputElement>("#exam-root .mark");
+    const countEl = document.getElementById("exam-count")!;
+    const leaves = document.querySelectorAll<HTMLElement>("#exam-gathering i");
+    const sections = document.querySelectorAll<HTMLElement>("#exam-root [data-section]");
+
+    function render() {
+      let total = 0;
+      boxes.forEach((b) => {
+        const on = !!marks[b.dataset.key!];
+        b.checked = on;
+        if (on) total++;
+      });
+      countEl.textContent = `${total} tanda`;
+      sections.forEach((sec, i) => {
+        const any = [...sec.querySelectorAll<HTMLInputElement>(".mark")].some((b) => b.checked);
+        leaves[i]?.classList.toggle("is-done", any);
+      });
+    }
+
+    boxes.forEach((b) =>
+      b.addEventListener("change", () => {
+        if (b.checked) marks[b.dataset.key!] = 1;
+        else delete marks[b.dataset.key!];
+        localStorage.setItem(KEY, JSON.stringify(marks));
+        render();
+      })
+    );
+
+    document.getElementById("exam-clear")!.addEventListener("click", () => {
+      marks = {};
+      localStorage.removeItem(KEY);
+      render();
+    });
+
+    render();
+  </script>
+</Base>

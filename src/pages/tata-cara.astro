@@ -1,0 +1,107 @@
+---
+import Base from "../layouts/Base.astro";
+import { loadBooklet } from "../lib/booklet";
+import type { RitePart } from "../lib/booklet";
+
+const b = loadBooklet();
+const { petunjuk, steps } = b.tataCara;
+
+const renderPart = (p: RitePart) =>
+  p.kind === "speech" ? "rite-speech" : p.kind === "action" ? "rite-action lectio" : "rite-note";
+---
+
+<Base title="Tata Cara Pengakuan Dosa — Panduan Pengakuan Dosa" current="/tata-cara/">
+  <main class="wrap">
+    <p class="rubric page-kicker">Tata Cara</p>
+    <h1 class="canticle page-title">Tata Cara Pengakuan Dosa</h1>
+
+    <section class="folio">
+      <h2 class="incipit">Petunjuk</h2>
+      <div class="quire">
+        {petunjuk.map((p, i) => (
+          <p class="lectio" style="padding-block: calc(var(--space) * 2);">{i + 1}. {p}</p>
+        ))}
+      </div>
+      <p class="gloss" style="margin-top: calc(var(--space) * 3);">Yang <span class="rubric" style="font-size: inherit;">merah</span> adalah yang dilakukan; yang <em>miring</em> adalah yang diucapkan.</p>
+    </section>
+
+    <div class="exam-controls" style="margin-top: calc(var(--space) * 6);">
+      <span class="gloss" id="rite-pos" aria-live="polite"></span>
+      <button class="btn btn--quiet" id="rite-toggle-all" type="button">Tampilkan semua</button>
+    </div>
+    <div class="gathering" id="rite-gathering" aria-hidden="true">
+      {steps.map(() => <i></i>)}
+    </div>
+
+    <div id="rite-root" class="rite-all">
+      {steps.map((st, i) => (
+        <section class="folio rite-step" data-step={i}>
+          <h2 class="incipit"><span class="versal" aria-hidden="true">{i + 1}</span>Langkah {i + 1}</h2>
+          {st.umat.length > 0 && (
+            <div class="rite-voice">
+              <p class="rubric">Umat</p>
+              {st.umat.map((p) => (
+                <p class={renderPart(p)}>{p.text}</p>
+              ))}
+            </div>
+          )}
+          {st.imam.length > 0 && (
+            <div class="rite-voice">
+              <p class="rubric">Imam</p>
+              {st.imam.map((p) => (
+                <p class={renderPart(p)}>{p.text}</p>
+              ))}
+            </div>
+          )}
+        </section>
+      ))}
+    </div>
+
+    <div class="rite-controls" id="rite-controls" hidden>
+      <button class="btn btn--quiet" id="rite-prev" type="button">← Sebelumnya</button>
+      <span class="spacer"></span>
+      <button class="btn" id="rite-next" type="button">Berikutnya →</button>
+    </div>
+
+    <p class="ornament" aria-hidden="true">• • •</p>
+    <section class="folio">
+      <p class="rubric">Selesai</p>
+      <p class="lectio">Segera setelah keluar dari Ruang Pengakuan Dosa, lakukanlah Penitensimu, dan pergilah dalam damai, serta jangan berbuat dosa lagi.</p>
+      <div class="rite-controls">
+        <button class="btn btn--quiet" id="rite-clear-marks" type="button">Hapus tanda pemeriksaan batin</button>
+      </div>
+      <p class="gloss" style="margin-top: calc(var(--space) * 2);" id="rite-clear-done" hidden>Semua tanda telah dihapus dari perangkat ini.</p>
+    </section>
+  </main>
+
+  <script>
+    const root = document.getElementById("rite-root")!;
+    const stepsEls = [...document.querySelectorAll<HTMLElement>(".rite-step")];
+    const leaves = document.querySelectorAll<HTMLElement>("#rite-gathering i");
+    const pos = document.getElementById("rite-pos")!;
+    const controls = document.getElementById("rite-controls")!;
+    const toggleBtn = document.getElementById("rite-toggle-all")!;
+    let cur = 0;
+    let all = true;
+
+    function render() {
+      root.classList.toggle("rite-all", all);
+      controls.hidden = all;
+      stepsEls.forEach((el, i) => el.classList.toggle("is-current", i === cur));
+      leaves.forEach((l, i) => l.classList.toggle("is-done", all || i <= cur));
+      pos.textContent = all ? `${stepsEls.length} langkah` : `Langkah ${cur + 1} dari ${stepsEls.length}`;
+      toggleBtn.textContent = all ? "Satu per satu" : "Tampilkan semua";
+    }
+
+    toggleBtn.addEventListener("click", () => { all = !all; cur = 0; render(); if (!all) stepsEls[0].scrollIntoView({ block: "center" }); });
+    document.getElementById("rite-prev")!.addEventListener("click", () => { if (cur > 0) { cur--; render(); } });
+    document.getElementById("rite-next")!.addEventListener("click", () => { if (cur < stepsEls.length - 1) { cur++; render(); } });
+
+    document.getElementById("rite-clear-marks")!.addEventListener("click", () => {
+      localStorage.removeItem("pb-marks-v1");
+      document.getElementById("rite-clear-done")!.hidden = false;
+    });
+
+    render();
+  </script>
+</Base>

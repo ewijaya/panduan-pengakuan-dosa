@@ -1,0 +1,56 @@
+---
+import Base from "../layouts/Base.astro";
+import { loadBooklet } from "../lib/booklet";
+
+const b = loadBooklet();
+const c = b.credits;
+---
+
+<Base title="Tentang — Panduan Pengakuan Dosa" current="/tentang/">
+  <main class="wrap">
+    <p class="rubric page-kicker">Tentang panduan ini</p>
+    <h1 class="canticle page-title">Tentang</h1>
+
+    <div class="stack">
+      <section class="folio">
+        <p class="lectio">Aplikasi ini adalah wujud digital dari buklet <strong>"Sakramen Tobat (Pengakuan Dosa)"</strong> yang diedarkan secara terbuka (<strong>GRATIS</strong>) oleh Keuskupan Surabaya. Seluruh teks diambil apa adanya dari buklet tersebut.</p>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit"><span class="versal" aria-hidden="true">P</span>Penyunting</h2>
+        <p class="lectio" style="font-size: var(--text-incipit); font-family: var(--font-display);">{c.penyunting}</p>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit">Nihil Obstat</h2>
+        {c.nihilObstat.map((l) => <p class="lectio">{l}</p>)}
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit">Imprimatur</h2>
+        {c.imprimatur.map((l) => <p class="lectio">{l}</p>)}
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit">Penerbit</h2>
+        {c.publisher.map((l) => <p class="lectio">{l}</p>)}
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit">Sampul</h2>
+        {c.cover.map((l) => <p class="lectio"><em>{l}</em></p>)}
+        <p class="gloss" style="margin-top: calc(var(--space) * 3);"><em>La confessione</em> (1838), Giuseppe Molteni — Gallerie d'Italia, Milano. Foto: Artgate Fondazione Cariplo (domain publik).</p>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit">Privasi</h2>
+        <p class="lectio">Tidak ada data yang meninggalkan perangkat Anda. Tanda pada Pemeriksaan Batin disimpan hanya di penyimpanan lokal peramban Anda, tanpa akun, tanpa server, dan tanpa pelacakan — dan dapat dihapus kapan saja dengan satu tombol.</p>
+      </section>
+
+      <section class="folio">
+        <h2 class="incipit">Kesetiaan teks</h2>
+        <p class="lectio">Teks ditampilkan setia pada buklet cetak. Sejumlah kecil salah cetak yang nyata diperbaiki dalam tampilan; daftar lengkapnya terdokumentasi di berkas <code>docs/CORRECTIONS.md</code> pada sumber proyek ini.</p>
+      </section>
+    </div>
+  </main>
+</Base>
