@@ -300,9 +300,11 @@ function parseExamination(pages: Map<string, string>): Booklet["pemeriksaanBatin
 function classifyPart(part: string): RitePart {
   // Speech/action cells are styled wholesale by the UI, so residual emphasis
   // markers from nested print styling are dropped rather than rendered.
+  // Actions keep their printed parentheses: Petunjuk #1 ("Lakukan tulisan di
+  // (dalam kurung)") refers to them.
   const clean = (s: string) => s.replace(/\*+/g, "").trim();
   const t = part.trim();
-  if (t.startsWith("(")) return { kind: "action", text: clean(t.replace(/^\(|\)$/g, "")) };
+  if (t.startsWith("(")) return { kind: "action", text: clean(t) };
   if (/^\*{1,3}/.test(t)) return { kind: "speech", text: clean(t) };
   return { kind: "note", text: clean(t) };
 }
