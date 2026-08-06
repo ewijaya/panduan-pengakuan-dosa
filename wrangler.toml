@@ -1,17 +1,19 @@
-# Cloudflare Pages configuration.
+# LOCAL DEVELOPMENT ONLY — `wrangler pages dev dist`.
 #
-# The static site itself needs none of this; it exists for the two Pages
-# Functions in functions/:
-#   /api/beacon  — anonymous, aggregate page-open counter (Analytics Engine)
-#   /admin       — ops dashboard reading that dataset via the SQL API
+# Deliberately WITHOUT `pages_build_output_dir`. Adding that key would make
+# this file authoritative for `wrangler pages deploy`, and Pages would then
+# deploy "whatever configuration was defined for local use" — silently
+# dropping the dashboard's ANALYTICS_ACCOUNT_ID and ANALYTICS_READ_TOKEN and
+# leaving /admin permanently at its 503 guard.
+# See https://developers.cloudflare.com/pages/functions/wrangler-configuration/
 #
-# /admin additionally needs two secrets on the Pages project (Settings →
-# Environment variables, or `wrangler pages secret put <NAME>`):
-#   ANALYTICS_ACCOUNT_ID   — Cloudflare account id
-#   ANALYTICS_READ_TOKEN   — API token with Account Analytics : Read
+# Production config is the Cloudflare dashboard, under
+# Workers & Pages → panduan-pengakuan-dosa → Settings:
+#   Variables and Secrets → ANALYTICS_ACCOUNT_ID (text)
+#                           ANALYTICS_READ_TOKEN (secret, Account Analytics : Read)
+#   Bindings              → Analytics Engine, PDP_ANALYTICS → pdp_events
 
 name = "panduan-pengakuan-dosa"
-pages_build_output_dir = "dist"
 compatibility_date = "2026-08-01"
 
 [[analytics_engine_datasets]]
