@@ -22,10 +22,14 @@ export default function serviceWorker() {
     hooks: {
       "astro:build:done": async ({ dir, logger }) => {
         const dist = fileURLToPath(dir);
-        // Never precache the worker itself, nor Pages Function sources — CI
-        // stages functions/ into dist/ for direct upload (.github/workflows).
+        // Never precache the worker itself, Pages Function sources (CI stages
+        // functions/ into dist/ for direct upload — .github/workflows), or
+        // /admin-only assets (Leaflet, its OG card, its favicon): readers'
+        // phones should not carry the ops dashboard's weight.
+        const ADMIN_ONLY = ["/vendor/", "/og-admin-", "/admin-favicon"];
         const files = walk(dist, dist).filter(
-          (f) => f !== "/sw.js" && !f.startsWith("/functions/")
+          (f) => f !== "/sw.js" && !f.startsWith("/functions/") &&
+            !ADMIN_ONLY.some((p) => f.startsWith(p))
         );
         // Serve pretty URLs for HTML: /a/index.html → /a/
         const urls = files.map((f) => f.replace(/index\.html$/, ""));

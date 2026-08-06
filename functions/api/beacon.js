@@ -13,6 +13,8 @@
  *   blob2    path
  *   blob3    country     blob4  region      blob5  city
  *   blob6    device      blob7  language    blob8  timezone
+ *   blob9    latitude    blob10 longitude   (Cloudflare's city-level
+ *            centroid, same coarse geo as blob3–5 — for the /admin map)
  *   double1  1
  */
 
@@ -40,6 +42,8 @@ export async function onRequestPost({ request, env }) {
       device,
       lang,
       cf.timezone ?? "",
+      cf.latitude ?? "",
+      cf.longitude ?? "",
     ],
     doubles: [1],
   });
