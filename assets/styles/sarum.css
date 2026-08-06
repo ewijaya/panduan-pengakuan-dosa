@@ -1,0 +1,423 @@
+/* ==========================================================================
+   SARUM VELLUM — design tokens for panduan-pengakuan-dosa
+   ==========================================================================
+   Palette:   "Sarum Rubric" — English liturgical use, 14th–15th c.
+              Three ranks: TEXT (what is said) · RUBRIC (what is done) ·
+              VERSAL (finding your place). Black says, red does, blue finds.
+   Type:      "Sturdy Vellum" — Vollkorn (text) · Vollkorn SC (display/
+              small caps) · Jost (UI chrome). Chosen for dark-mode weight
+              retention and variable-font file economy.
+   Modes:     light ("recto") and dark ("night office"). Dark follows the
+              OS by default; override with data-theme="light|dark" on <html>.
+   Contrast:  every token pairing named in the usage table below passes
+              WCAG 2.1 AA (≥ 4.5:1); most pass AAA.
+
+   FONT FILES — self-hosted, per the offline-first requirement. Do NOT link
+   Google Fonts CDN in production. Download once, subset to latin, and place
+   in ./fonts/ relative to this file:
+
+     vollkorn-var.woff2          Vollkorn variable,   wght 400–900, roman
+     vollkorn-italic-var.woff2   Vollkorn variable,   wght 400–900, italic
+     vollkorn-sc-600.woff2       Vollkorn SC static,  600
+     jost-var.woff2              Jost variable,       wght 100–900
+
+   Get them (Google Fonts, OFL licence — bundling in the app is fine):
+     https://fonts.google.com/specimen/Vollkorn
+     https://fonts.google.com/specimen/Vollkorn+SC
+     https://fonts.google.com/specimen/Jost
+   Subset with e.g.:
+     pyftsubset Vollkorn-VF.ttf --unicodes="U+0000-00FF,U+2013-2014,U+2018-201D,U+2022,U+2026" \
+       --flavor=woff2 --output-file=vollkorn-var.woff2
+   Indonesian needs nothing beyond basic Latin; a latin subset keeps each
+   file in the 25–45 KB range.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1 · @font-face
+   -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Vollkorn";
+  src: url("./fonts/vollkorn-var.woff2") format("woff2-variations");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vollkorn";
+  src: url("./fonts/vollkorn-italic-var.woff2") format("woff2-variations");
+  font-weight: 400 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vollkorn SC";
+  src: url("./fonts/vollkorn-sc-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("./fonts/jost-var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --------------------------------------------------------------------------
+   2 · Core tokens
+   --------------------------------------------------------------------------
+   USAGE TABLE — what goes on what (all pairs AA+):
+
+     --ink        on --parchment, --leaf, --gloss   body text, headings
+     --ink-soft   on --parchment, --leaf            secondary text, unchecked
+                                                    questions, folio numbers
+     --rubric     on --parchment, --leaf            instructions, active marks,
+                                                    primary buttons (bg)
+     --on-rubric  on --rubric                       button labels, check ticks
+     --versal-ink on --versal                       versal initials only
+     --rule       hairlines between questions       (decorative — no contrast
+     --edge       card & input borders               requirement)
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* ---- rank 1 · TEXT (what is said) ---- */
+  --parchment:  #F9F5EA;   /* page ground */
+  --leaf:       #FFFDF6;   /* raised surface: cards, sheets, dialogs */
+  --gloss:      #F1E5D8;   /* inset surface: quoted verse, prayer blocks */
+  --ink:        #16130D;   /* primary text            17.0:1 on parchment */
+  --ink-soft:   #57503F;   /* secondary text           7.3:1 on parchment */
+
+  /* ---- rank 2 · RUBRIC (what is done) ---- */
+  --rubric:     #A81A1A;   /* instructions, actions    6.8:1 on parchment */
+  --on-rubric:  #FFF9F2;   /* text on rubric fills     7.1:1 on rubric    */
+
+  /* ---- rank 3 · VERSAL (finding your place) ---- */
+  --versal:      #25478C;  /* versal field, place markers */
+  --versal-ink:  #F6EFDD;  /* initial letter on field  7.8:1 on versal    */
+  --versal-edge: #1A3369;  /* versal border */
+
+  /* ---- structure ---- */
+  --rule:       #DFD5BE;   /* ruled quire lines between questions */
+  --edge:       #E3DBC8;   /* borders on cards and inputs */
+
+  /* ---- families ---- */
+  --font-text:    "Vollkorn", "Iowan Old Style", Palatino, Georgia, serif;
+  --font-display: "Vollkorn SC", "Vollkorn", Palatino, Georgia, serif;
+  --font-ui:      "Jost", ui-sans-serif, system-ui, sans-serif;
+
+  /* ---- type scale (fluid; minor-third-ish, tuned by hand) ----
+     Roles, not sizes: pick by what the text IS.                  */
+  --text-canticle: clamp(1.75rem, 1.4rem + 1.6vw, 2.375rem); /* screen titles      */
+  --text-incipit:  clamp(1.31rem, 1.15rem + 0.8vw, 1.625rem);/* section headings   */
+  --text-lectio:   clamp(1rem,    0.95rem + 0.25vw, 1.125rem);/* body — questions,
+                                                                 prayers            */
+  --text-rubric:   0.8125rem;                                 /* instructions, UI   */
+  --text-gloss:    0.75rem;                                   /* folio nums, meta   */
+
+  --leading-lectio:  1.65;   /* body: examination is read line by line   */
+  --leading-incipit: 1.25;
+  --leading-tight:   1.1;
+
+  --track-rubric: 0.09em;    /* letterspacing for uppercase rubric lines */
+  --track-display: 0.02em;
+
+  /* ---- shape & rhythm ---- */
+  --space: 0.25rem;          /* base unit; use multiples (4/8/12/16/24/32) */
+  --radius: 3px;             /* manuscripts are not rounded; keep it near-square */
+  --rule-w: 1px;
+  --grain-opacity: 0.045;    /* vellum noise overlay, see §6 */
+
+  color-scheme: light dark;
+}
+
+/* --------------------------------------------------------------------------
+   3 · Night office (dark)
+   --------------------------------------------------------------------------
+   Follows the OS unless <html data-theme="…"> pins it. Same token names —
+   components never branch on mode.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --parchment:  #100E0A;
+    --leaf:       #1A1712;
+    --gloss:      #221B14;
+    --ink:        #F4EEDE;   /* 16.6:1 on parchment */
+    --ink-soft:   #A0957F;   /*  6.5:1 on parchment */
+
+    --rubric:     #E56B5C;   /*  6.0:1 on parchment */
+    --on-rubric:  #180806;
+
+    --versal:      #1C2338;
+    --versal-ink:  #93AEE8;  /*  7.0:1 on versal */
+    --versal-edge: #2A3350;
+
+    --rule:       #272219;
+    --edge:       #2C2820;
+
+    --grain-opacity: 0.04;
+  }
+}
+
+:root[data-theme="dark"] {
+  --parchment:  #100E0A;
+  --leaf:       #1A1712;
+  --gloss:      #221B14;
+  --ink:        #F4EEDE;
+  --ink-soft:   #A0957F;
+
+  --rubric:     #E56B5C;
+  --on-rubric:  #180806;
+
+  --versal:      #1C2338;
+  --versal-ink:  #93AEE8;
+  --versal-edge: #2A3350;
+
+  --rule:       #272219;
+  --edge:       #2C2820;
+
+  --grain-opacity: 0.04;
+}
+
+/* --------------------------------------------------------------------------
+   4 · Base application
+   -------------------------------------------------------------------------- */
+
+html {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 100%;                 /* respect user browser setting */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-size: var(--text-lectio);
+  line-height: var(--leading-lectio);
+  font-feature-settings: "onum" 1, "liga" 1;  /* old-style figures site-wide:
+                                                 page numbers should sit in the
+                                                 text like a manuscript folio
+                                                 number, not a price tag */
+  text-rendering: optimizeLegibility;
+}
+
+/* Vollkorn SC supplies real small caps — never let the browser fake
+   bold/italic/smallcaps it doesn't have files for. */
+body { font-synthesis: none; }
+
+::selection {
+  background: var(--versal);
+  color: var(--versal-ink);
+}
+
+/* --------------------------------------------------------------------------
+   5 · The three ranks, as classes
+   -------------------------------------------------------------------------- */
+
+/* rank 1 — TEXT: what is said. Questions, prayers, explanations. */
+.lectio {
+  font-family: var(--font-text);
+  font-size: var(--text-lectio);
+  line-height: var(--leading-lectio);
+  color: var(--ink);
+}
+
+.lectio--soft { color: var(--ink-soft); }   /* unchecked questions */
+
+/* Prayers are the booklet's italic voice. */
+.oratio {
+  font-family: var(--font-text);
+  font-style: italic;
+  font-size: var(--text-lectio);
+  line-height: var(--leading-lectio);
+  background: var(--gloss);
+  border-left: 3px solid var(--rubric);
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 3) calc(var(--space) * 4);
+}
+
+/* rank 2 — RUBRIC: what is done. Never used for content. */
+.rubric {
+  font-family: var(--font-ui);
+  font-size: var(--text-rubric);
+  font-weight: 600;
+  letter-spacing: var(--track-rubric);
+  text-transform: uppercase;
+  color: var(--rubric);
+}
+
+/* rank 3 — VERSAL: finding your place. */
+.incipit {
+  font-family: var(--font-display);
+  font-size: var(--text-incipit);
+  font-weight: 600;
+  letter-spacing: var(--track-display);
+  line-height: var(--leading-incipit);
+  color: var(--ink);
+}
+
+.canticle {                      /* top-level screen titles */
+  font-family: var(--font-display);
+  font-size: var(--text-canticle);
+  font-weight: 600;
+  letter-spacing: var(--track-display);
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+/* The versal initial. Markup:
+     <h2 class="incipit">
+       <span class="versal" aria-hidden="true">P</span>Perintah Pertama
+     </h2>
+   The span duplicates the first letter for styling and is hidden from
+   assistive tech; screen readers get the plain heading text. */
+.versal {
+  float: left;
+  display: block;
+  width: 1.6em;
+  height: 1.6em;
+  margin: 0.08em 0.35em 0 0;
+  border-radius: 2px;
+  background: var(--versal);
+  color: var(--versal-ink);
+  border: 1px solid var(--versal-edge);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.35em;
+  line-height: 1.55em;
+  text-align: center;
+}
+
+/* Companion: hide the duplicated letter from the reading flow.
+     <span class="versal">P</span><span class="versal-rest">erintah …</span>
+   Optional — only if you want the versal to REPLACE the first letter
+   visually rather than sit beside the word. */
+.versal + .versal-rest { text-transform: none; }
+
+/* meta text — folio numbers, source attribution, "Halaman 5" */
+.gloss {
+  font-family: var(--font-ui);
+  font-size: var(--text-gloss);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+/* --------------------------------------------------------------------------
+   6 · Surfaces & structure
+   -------------------------------------------------------------------------- */
+
+.folio {                         /* a card = one leaf of the book */
+  position: relative;
+  background: var(--leaf);
+  border: var(--rule-w) solid var(--edge);
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 5) calc(var(--space) * 4);
+  overflow: hidden;
+}
+
+/* Vellum grain — pure inline SVG turbulence, no asset, no network.
+   Apply to .folio or to the page background wrapper. */
+.folio::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.5'/></svg>");
+}
+.folio > * { position: relative; }
+
+/* Ruled quire lines between examination questions */
+.quire { border-block: var(--rule-w) solid var(--rule); }
+.quire > * + * { border-top: var(--rule-w) solid var(--rule); }
+
+/* --------------------------------------------------------------------------
+   7 · Interactive
+   -------------------------------------------------------------------------- */
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: var(--text-rubric);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 0;
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 2.5) calc(var(--space) * 4.5);
+  background: var(--rubric);
+  color: var(--on-rubric);
+  cursor: pointer;
+  min-height: 44px;              /* touch target */
+}
+
+.btn--quiet {
+  background: transparent;
+  color: var(--ink-soft);
+  border: var(--rule-w) solid var(--edge);
+}
+
+/* Examination checkbox — the mark is rubric red: ticking is something DONE */
+.mark {
+  appearance: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0;
+  border-radius: 2px;
+  border: 1.5px solid var(--ink-soft);
+  background: transparent;
+  cursor: pointer;
+  flex: none;
+  position: relative;
+}
+.mark:checked {
+  background: var(--rubric);
+  border-color: var(--rubric);
+}
+.mark:checked::after {
+  content: "";
+  position: absolute;
+  left: 0.28rem;
+  top: 0.06rem;
+  width: 0.26rem;
+  height: 0.55rem;
+  border: solid var(--on-rubric);
+  border-width: 0 2px 2px 0;
+  transform: rotate(43deg);
+}
+
+:is(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--versal);   /* blue finds your place — including
+                                         the keyboard's place */
+  outline-offset: 2px;
+}
+
+/* Quiet progress — a gathering of leaves, not a gamified bar */
+.gathering { display: flex; gap: 4px; }
+.gathering i {
+  height: 3px; flex: 1;
+  background: var(--rule);
+  border-radius: 2px;
+}
+.gathering i.is-done { background: var(--rubric); }
+
+/* --------------------------------------------------------------------------
+   8 · Courtesies
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {                   /* the booklet returns to paper gracefully */
+  :root { --parchment: #FFFFFF; --leaf: #FFFFFF; --grain-opacity: 0; }
+  .btn, .gathering { display: none; }
+}
