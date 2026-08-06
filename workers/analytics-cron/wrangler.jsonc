@@ -1,0 +1,26 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "pdp-analytics-cron",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-01",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "vars": {
+    // account id is not a secret (it appears in every dashboard URL)
+    "ANALYTICS_ACCOUNT_ID": "f0ae3a575c270b4170653476cbe4a14b"
+  },
+  // The read token is a real secret — installed by CI via wrangler-action's
+  // `secrets:` input from the GitHub Actions secret ANALYTICS_READ_TOKEN.
+  "kv_namespaces": [
+    {
+      "binding": "PDP_STORE",
+      // Create in the dashboard (Workers KV → Create Instance →
+      // "pdp_analytics_store") and paste the namespace id here.
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID"
+    }
+  ],
+  "triggers": {
+    // Sunday 20:00 UTC = Monday 03:00 WIB — rolls up the trailing 7 days
+    "crons": ["0 20 * * SUN"]
+  }
+}

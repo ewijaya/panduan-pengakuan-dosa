@@ -144,8 +144,20 @@ export async function onRequestGet({ request, env }) {
     });
   }
 
-  const raw = Number(url.searchParams.get("days"));
-  const days = [7, 30, 90].includes(raw) ? raw : 7;
+  const store = env.PDP_STORE ?? null; // KV archive written by workers/analytics-cron
+
+  // ?week=YYYY-MM-DD — drill into one archived KV rollup.
+  const week = url.searchParams.get("week");
+  if (week !== null) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(week)) return new Response("Bad week", { status: 400 });
+    const rollup = store ? await store.get(`rollup:${week}`, "json") : null;
+    return weekPage(week, rollup);
+  }
+
+  const rawDays = url.searchParams.get("days") ?? "";
+  const allTime = rawDays === "all";
+  // 'all' = full KV history + live SQL capped at AE's ~90-day ceiling.
+  const days = allTime ? 90 : [7, 30, 90].includes(Number(rawDays)) ? Number(rawDays) : 7;
   const chartDays = Math.max(days, 30);
   const since = (d) => `timestamp >= NOW() - INTERVAL '${d}' DAY`;
 
@@ -312,6 +324,72 @@ export async function onRequestGet({ request, env }) {
       <div class="slegend">${entries.map(([k, n], i) => `<span><i class="sw c${i % 5}"></i>${esc(k)} ${num(n)}</span>`).join(" ")}</div>`;
   };
 
+  /* -- permanent memory: the KV archive (weekly rollups, never expire) -- */
+  let digest = null, kvError = null;
+  if (store) {
+    try { digest = await store.get("digest:latest", "json"); } catch (e) { kvError = e.message; }
+  }
+  const weeks = digest?.weeks ?? [];
+  const lastEnd = weeks.at(-1)?.end ?? null;
+  const maxWeek = Math.max(1, ...weeks.map((w) => Number(w.events)));
+
+  // All-time figures: every archived week + live events since the last
+  // rollup's exclusive end (no overlap, no double count).
+  let allTimeBlock = "";
+  if (allTime) {
+    let liveEvents = total;
+    try {
+      if (lastEnd) {
+        const r = await sql(env, `SELECT SUM(_sample_interval) AS total FROM ${DATASET}
+          WHERE timestamp >= toDateTime('${lastEnd} 00:00:00')`);
+        liveEvents = Number(r?.[0]?.total ?? 0);
+      }
+    } catch { /* keep the 90-day figure */ }
+    const weekSum = weeks.reduce((s, w) => s + Number(w.events), 0);
+    const allCountries = new Set([...countrySet]);
+    weeks.forEach((w) => (w.countries ?? []).forEach((c) => allCountries.add(c)));
+    const pathSums = new Map();
+    weeks.forEach((w) => (w.topPaths ?? []).forEach(([p, n]) => pathSums.set(p, (pathSums.get(p) || 0) + Number(n))));
+    const allPaths = [...pathSums.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+    allTimeBlock = `
+  <div class="tiles">
+    <div class="tile"><div class="lbl">Kunjungan, sepanjang waktu</div><div class="val">${num(weekSum + liveEvents)}</div><div class="sub">${weeks.length ? `${num(weeks.length)} pekan terarsip + live sejak ${esc(lastEnd)}` : "hanya jendela live 90 hari (belum ada arsip)"}</div></div>
+    <div class="tile"><div class="lbl">Negara, sepanjang waktu</div><div class="val">${num(allCountries.size)}</div><div class="sub">gabungan arsip + jendela live</div></div>
+    <div class="tile"><div class="lbl">Pekan terarsip</div><div class="val">${num(weeks.length)}</div><div class="sub">rollup KV, tak pernah kedaluwarsa</div></div>
+  </div>
+  ${allPaths.length ? `<section class="card"><h2>Halaman teratas — sepanjang waktu</h2>
+    <table><thead><tr><th>Halaman</th><th class="n">Kunjungan</th></tr></thead>
+    <tbody>${allPaths.map(([p, n]) => `<tr><td><span title="${esc(p)}">${esc(pageName(p))}</span></td><td class="n">${num(n)}</td></tr>`).join("")}</tbody></table>
+    <p class="note">Dijumlah dari 5 halaman teratas tiap rollup mingguan — sinyal kuat, bukan peringkat persis ekor panjang.</p>
+  </section>` : ""}`;
+  }
+
+  // Weekly history card — always present so the archive's state is visible.
+  const weeklyCard = !store
+    ? `<section class="card"><h2>Arsip mingguan (tak lekang)</h2>
+        <p class="empty">Belum aktif — tambahkan binding KV <code>PDP_STORE</code> → namespace <code>pdp_analytics_store</code> pada proyek Pages (Settings → Bindings), lalu buat deployment baru.</p></section>`
+    : kvError
+      ? `<section class="card"><h2>Arsip mingguan (tak lekang)</h2><p class="empty">KV gagal dibaca: ${esc(kvError)}</p></section>`
+      : weeks.length
+        ? `<section class="card"><h2>Arsip mingguan (tak lekang)</h2>
+            <div class="chart" style="height:80px">
+              ${weeks.slice(allTime ? 0 : -26).map((w) => `<div class="col" tabindex="0">
+                <span class="tip">${esc(w.start)} → ${esc(w.end)} · ${num(w.events)} kunjungan</span>
+                <div class="bar ${Number(w.events) === 0 ? "zero" : ""}" style="height:${Math.max(1, Math.round((Number(w.events) / maxWeek) * 100))}%"></div>
+              </div>`).join("")}
+            </div>
+            <table><thead><tr><th>Pekan berakhir</th><th class="n">Kunjungan</th><th class="n">Dari aplikasi</th><th>Halaman teratas</th></tr></thead><tbody>
+              ${[...weeks].reverse().slice(0, allTime ? weeks.length : 12).map((w) => `<tr>
+                <td><a href="/admin?week=${esc(w.end)}">${esc(w.end)}</a></td>
+                <td class="n">${num(w.events)}</td>
+                <td class="n">${num(w.byEvent?.pwa ?? 0)}</td>
+                <td>${esc(pageName(w.topPaths?.[0]?.[0] ?? "") || "—")}</td></tr>`).join("")}
+            </tbody></table>
+            ${!allTime && weeks.length > 12 ? `<p class="empty">…dan ${num(weeks.length - 12)} pekan lebih awal — <a href="/admin?days=all">lihat semua</a>, atau pilih pekan untuk rinciannya.</p>` : ""}
+          </section>`
+        : `<section class="card"><h2>Arsip mingguan (tak lekang)</h2>
+            <p class="empty">Binding aktif, belum ada rollup — cron menulis tiap Minggu 20.00 UTC (Senin 03.00 WIB). Sampai itu, jendela live 7/30/90 hari di atas mencakup semuanya.</p></section>`;
+
   /* -- visit sources: browser vs installed app, plus Android installs -- */
   const SOURCE_LABELS = { view: "peramban", pwa: "aplikasi terpasang" };
   const sources = (byEvent ?? [])
@@ -319,7 +397,8 @@ export async function onRequestGet({ request, env }) {
     .map((r) => ({ k: SOURCE_LABELS[r.k] ?? r.k, total: r.total }));
   const installs = Number((byEvent ?? []).find((r) => r.k === "install")?.total ?? 0);
 
-  const ranges = [[7, "7 hari"], [30, "30 hari"], [90, "90 hari"]];
+  const ranges = [[7, "7 hari"], [30, "30 hari"], [90, "90 hari"], ["all", "Semua"]];
+  const current = allTime ? "all" : days;
 
   const body = `<!doctype html>
 <html lang="id"><head>
@@ -394,6 +473,7 @@ export async function onRequestGet({ request, env }) {
     font-variant: small-caps; letter-spacing: 0.1em; color: var(--red); }
   .note { font-size: 0.78rem; font-style: italic; color: var(--ink-soft); margin: 0.4rem 0 0.6rem; }
   .empty { font-style: italic; color: var(--ink-soft); font-size: 0.9rem; margin: 0.2rem 0; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 0.85em; }
   .err { background: var(--bg-raised); border: 1px solid var(--red); border-radius: 6px;
     padding: 0.7rem 1rem; color: var(--red); font-size: 0.85rem; margin: 0 0 1rem; }
 
@@ -548,12 +628,14 @@ export async function onRequestGet({ request, env }) {
   <header>
     <div class="cross">✠</div>
     <h1><a href="/">Panduan Pengakuan Dosa</a> · Analitik</h1>
-    <p>jendela live: ${days} hari terakhir · waktu dalam WIB · <a href="/">ke situs</a></p>
+    <p>${allTime ? "sepanjang waktu — panel live dibatasi 90 hari" : `jendela live: ${days} hari terakhir`} · waktu dalam WIB · <a href="/">ke situs</a></p>
   </header>
 
   <nav class="filters">${ranges.map(([v, label]) =>
-    `<a href="/admin?days=${v}" class="${v === days ? "on" : ""}">${label}</a>`).join("")}
-    <span class="fnote">Analytics Engine menyimpan ±90 hari; angka adalah perkiraan tersampel.</span></nav>
+    `<a href="/admin?days=${v}" class="${v === current ? "on" : ""}">${label}</a>`).join("")}
+    <span class="fnote">${allTime
+      ? "panel live menampilkan 90 hari terakhir; bagian sepanjang-waktu di bawah mencakup seluruh arsip mingguan"
+      : "Analytics Engine menyimpan ±90 hari; angka adalah perkiraan tersampel."}</span></nav>
 
   ${sqlError ? `<div class="err">Kueri gagal: ${esc(sqlError)}</div>` : ""}
 
@@ -567,6 +649,8 @@ export async function onRequestGet({ request, env }) {
     <div class="tile"><div class="lbl">Tempat</div><div class="val">${num(byPlace.length)}</div><div class="sub">kelompok kota</div></div>
     <div class="tile"><div class="lbl">Negara</div><div class="val">${num(countrySet.size)}</div><div class="sub">terjangkau dalam ${days} hari</div></div>
   </div>
+
+  ${allTimeBlock}
 
   ${newestPanel}
 
@@ -613,9 +697,11 @@ export async function onRequestGet({ request, env }) {
       Pemasangan tercatat: ${num(installs)} — momen pemasangan hanya dapat dideteksi di Android; iPhone tidak pernah mengumumkannya, jadi angka sebenarnya lebih tinggi.</p>
   </section>
 
+  ${weeklyCard}
+
   <footer><span class="cross">✠</span> Dibuat ${esc(wibStamp(new Date(Date.now()).toISOString().slice(0, 19).replace("T", " ")))} WIB ·
     beacon menghitung kunjungan halaman saja — tanpa cookie, tanpa identitas; tanda pemeriksaan batin tidak pernah meninggalkan perangkat pembaca.<br>
-    Analytics Engine menyimpan ±90 hari · sejak ${esc(prettyDay(`${LAUNCH_DAY} 00:00:00`))}</footer>
+    Analytics Engine menyimpan ±90 hari; arsip mingguan KV menyimpan selamanya · sejak ${esc(prettyDay(`${weeks[0]?.start ?? LAUNCH_DAY} 00:00:00`))}</footer>
 </div>
 <script>
 /* Leaflet map */
@@ -722,6 +808,84 @@ export async function onRequestGet({ request, env }) {
 </body></html>`;
 
   return new Response(body, {
+    headers: {
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store",
+      "x-robots-tag": "noindex, nofollow",
+    },
+  });
+}
+
+/* ------------------------------------------ archived-week drill-down */
+
+const EVENT_LABELS = { view: "Peramban", pwa: "Aplikasi terpasang", install: "Pemasangan (Android)" };
+
+function weekPage(week, rollup) {
+  const rows = rollup?.rows ?? [];
+  const total = rows.reduce((s, r) => s + Number(r.total), 0);
+  const sumBy = (keyOf) => {
+    const m = new Map();
+    for (const r of rows) {
+      const k = keyOf(r);
+      if (k) m.set(k, (m.get(k) || 0) + Number(r.total));
+    }
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  };
+  const tbl = (title, head, list) => `<section class="card"><h2>${esc(title)}</h2>
+    ${list.length
+      ? `<table><thead><tr><th>${esc(head)}</th><th class="n">Kunjungan</th></tr></thead>
+         <tbody>${list.map(([k, n]) => `<tr><td>${k}</td><td class="n">${num(n)}</td></tr>`).join("")}</tbody></table>`
+      : '<p class="empty">Tidak ada data.</p>'}</section>`;
+
+  const content = !rollup
+    ? `<section class="card"><h2>rollup:${esc(week)}</h2>
+       <p class="empty">Tidak ada rollup dengan kunci ini${rollup === null ? " (atau binding KV PDP_STORE belum aktif)" : ""}. <a href="/admin">Kembali ke dasbor</a>.</p></section>`
+    : `<p class="sub">${esc(rollup.start)} → ${esc(rollup.end)} (eksklusif) · ${num(total)} kunjungan · <a href="/admin?days=all">kembali ke dasbor</a></p>
+      ${tbl("Sumber", "Sumber", sumBy((r) => r.event).map(([e, n]) => [esc(EVENT_LABELS[e] ?? e), n]))}
+      ${tbl("Halaman", "Halaman", sumBy((r) => r.path).slice(0, 15).map(([p, n]) => [`<span title="${esc(p)}">${esc(pageName(p))}</span>`, n]))}
+      ${tbl("Tempat", "Tempat", sumBy((r) => (r.city ? `${r.city}|${r.country}` : null)).slice(0, 15)
+        .map(([k, n]) => {
+          const [city, country] = k.split("|");
+          return [`${flagOf(country)}${esc(city)}, ${esc(countryName(country))}`, n];
+        }))}
+      <footer><span class="cross">✠</span> Rollup KV permanen — tetap ada setelah jendela ±90 hari Analytics Engine berlalu.</footer>`;
+
+  const html = `<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Pekan ${esc(week)} · Admin · Panduan Pengakuan Dosa</title>
+<link rel="icon" href="/admin-favicon.svg" type="image/svg+xml">
+<style>
+  :root { --bg:#F9F5EA; --bg-raised:#FFFDF6; --ink:#16130D; --ink-soft:#57503F; --red:#A81A1A; --blue:#25478C; --rule:#DFD5BE; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#100E0A; --bg-raised:#1A1712; --ink:#F4EEDE; --ink-soft:#A0957F; --red:#E56B5C; --blue:#7C97CE; --rule:#272219; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 Georgia, serif; padding:1.2rem 1rem 3rem; }
+  .wrap { max-width:760px; margin:0 auto; }
+  a { color: var(--blue); }
+  header { text-align:center; margin:0.8rem 0 1.2rem; }
+  header .cross { color:var(--red); letter-spacing:0.35em; }
+  h1 { font-weight:500; font-variant:small-caps; letter-spacing:0.1em; font-size:1.4rem; margin:0.3rem 0 0.1rem; }
+  .sub { text-align:center; font-style:italic; color:var(--ink-soft); font-size:0.9rem; margin:0 0 1rem; }
+  .card { border:1px solid var(--rule); border-radius:6px; background:var(--bg-raised); padding:1rem 1.2rem 1.1rem; margin-bottom:1rem; }
+  .card h2 { margin:0 0 0.7rem; font-size:0.95rem; font-weight:500; font-variant:small-caps; letter-spacing:0.1em; color:var(--red); }
+  table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+  th { text-align:left; font-weight:500; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); padding:0.2rem 0.4rem; border-bottom:1px solid var(--rule); }
+  th.n, td.n { text-align:right; }
+  td { padding:0.3rem 0.4rem; border-bottom:1px solid color-mix(in srgb, var(--rule) 55%, transparent); }
+  td.n { font-family:system-ui, sans-serif; font-variant-numeric:tabular-nums; }
+  tr:last-child td { border-bottom:none; }
+  .flag { margin-right:0.35rem; }
+  .empty { font-style:italic; color:var(--ink-soft); font-size:0.9rem; }
+  footer { text-align:center; margin-top:1.6rem; font-size:0.8rem; font-style:italic; color:var(--ink-soft); }
+  footer .cross { color:var(--red); }
+</style></head><body><div class="wrap">
+  <header><div class="cross">✠</div><h1>Pekan arsip · ${esc(week)}</h1></header>
+  ${content}
+</div></body></html>`;
+
+  return new Response(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "no-store",

@@ -1,0 +1,41 @@
+name: Deploy analytics cron worker
+
+# Deploys workers/analytics-cron (the weekly KV rollup that gives /admin
+# memory beyond Analytics Engine's ~90 days). Needs, beyond the two secrets
+# the Pages deploy already uses:
+#   - GitHub secret ANALYTICS_READ_TOKEN (same token as the Pages secret) —
+#     installed on the worker via wrangler-action's `secrets:` input
+#   - CLOUDFLARE_API_TOKEN must carry "Workers Scripts : Edit"
+#   - the KV namespace id filled into workers/analytics-cron/wrangler.jsonc
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "workers/analytics-cron/**"
+      - ".github/workflows/deploy-worker.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Deploy worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: workers/analytics-cron
+          command: deploy
+          secrets: |
+            ANALYTICS_READ_TOKEN
+        env:
+          ANALYTICS_READ_TOKEN: ${{ secrets.ANALYTICS_READ_TOKEN }}
