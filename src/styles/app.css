@@ -22,6 +22,7 @@
 .site-header .bar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap; /* mid widths: nav drops to a second line, never clips */
   gap: calc(var(--space) * 3);
   padding-block: calc(var(--space) * 2.5);
 }
@@ -50,12 +51,10 @@
 
 .site-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: calc(var(--space) * 1.5);
-  overflow-x: auto;
-  scrollbar-width: none;
   margin-left: auto;
 }
-.site-nav::-webkit-scrollbar { display: none; }
 
 .site-nav a {
   font-family: var(--font-ui);
