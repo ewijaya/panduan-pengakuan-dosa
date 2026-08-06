@@ -1,11 +1,13 @@
 ---
 import Base from "../layouts/Base.astro";
 import { loadBooklet } from "../lib/booklet";
+import { loadDoaTobat } from "../lib/supplement";
 
 const b = loadBooklet();
+const doaTobat = loadDoaTobat();
 ---
 
-<Base title="Doa Sebelum Pengakuan Dosa — Panduan Pengakuan Dosa" current="/doa/">
+<Base title="Doa — Panduan Pengakuan Dosa" current="/doa/">
   <main class="wrap">
     <p class="rubric page-kicker">Doa</p>
     <h1 class="canticle page-title">Doa Sebelum Pengakuan Dosa</h1>
@@ -14,6 +16,15 @@ const b = loadBooklet();
       {b.doaSebelum.lines.map((line, i) => (
         <span class:list={{ amen: i === b.doaSebelum.lines.length - 1 }}>{line}<br /></span>
       ))}
+    </div>
+
+    <p class="ornament" aria-hidden="true">• • •</p>
+
+    <h2 class="canticle page-title">Doa Tobat</h2>
+    <p class="gloss" style="margin-bottom: calc(var(--space) * 3);">Puji Syukur no. 25 — didoakan di hadapan Imam sebagai wujud rasa sesal, sebelum penitensi.</p>
+
+    <div class="oratio" lang="id">
+      {doaTobat.paragraphs.map((p) => <p>{p}</p>)}
     </div>
 
     <a class="next-link" href="/pemeriksaan-batin/">Lanjut · Pemeriksaan Batin →</a>

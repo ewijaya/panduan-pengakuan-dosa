@@ -2,9 +2,11 @@
 import Base from "../layouts/Base.astro";
 import { loadBooklet } from "../lib/booklet";
 import type { RitePart } from "../lib/booklet";
+import { loadDoaTobat } from "../lib/supplement";
 
 const b = loadBooklet();
 const { petunjuk, steps } = b.tataCara;
+const doaTobat = loadDoaTobat();
 
 const renderPart = (p: RitePart) =>
   p.kind === "speech" ? "rite-speech" : p.kind === "action" ? "rite-action lectio" : "rite-note";
@@ -41,7 +43,17 @@ const renderPart = (p: RitePart) =>
             <div class="rite-voice">
               <p class="rubric">Umat</p>
               {st.umat.map((p) => (
-                <p class={renderPart(p)}>{p.text}</p>
+                <>
+                  <p class={renderPart(p)}>{p.text}</p>
+                  {p.text.includes("PS. 25") && (
+                    <details class="doa-tobat-fold">
+                      <summary class="rubric">Doa Tobat (PS. 25)</summary>
+                      <div class="oratio" lang="id">
+                        {doaTobat.paragraphs.map((par) => <p>{par}</p>)}
+                      </div>
+                    </details>
+                  )}
+                </>
               ))}
             </div>
           )}

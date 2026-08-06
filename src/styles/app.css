@@ -242,6 +242,10 @@ p + p { margin-top: calc(var(--space) * 3); }
   margin-top: calc(var(--space) * 2);
 }
 
+.doa-tobat-fold { margin-top: calc(var(--space) * 3); }
+.doa-tobat-fold summary { cursor: pointer; }
+.doa-tobat-fold[open] summary { margin-bottom: calc(var(--space) * 2); }
+
 .rite-controls {
   display: flex;
   gap: calc(var(--space) * 3);
