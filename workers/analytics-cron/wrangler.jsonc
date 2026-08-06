@@ -19,7 +19,9 @@
     }
   ],
   "triggers": {
-    // Sunday 20:00 UTC = Monday 03:00 WIB — rolls up the trailing 7 days
+    // Sunday 20:00 UTC = Monday 03:00 WIB — rolls up the trailing 7 days.
+    // Workers Free caps cron triggers per account; this slot was freed by
+    // retiring hop-web's dead daily R2-archive trigger.
     "crons": ["0 20 * * SUN"]
   }
 }
