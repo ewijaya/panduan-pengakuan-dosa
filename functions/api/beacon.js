@@ -9,7 +9,7 @@
  *
  * Datapoint layout (keep in sync with functions/admin.js):
  *   index    path (sampling key)
- *   blob1    event   ("view")
+ *   blob1    event   ("view" | "pwa" | "install")
  *   blob2    path
  *   blob3    country     blob4  region      blob5  city
  *   blob6    device      blob7  language    blob8  timezone
@@ -26,6 +26,11 @@ export async function onRequestPost({ request, env }) {
   const path = typeof body?.p === "string" && /^\/[a-zA-Z0-9\-/]{0,80}$/.test(body.p) ? body.p : null;
   if (!path) return new Response(null, { status: 204 });
 
+  // view = browser tab · pwa = launched from the installed app ·
+  // install = Android's appinstalled moment (iOS has no equivalent)
+  const EVENTS = new Set(["view", "pwa", "install"]);
+  const event = EVENTS.has(body?.e) ? body.e : "view";
+
   const cf = request.cf ?? {};
   const ua = request.headers.get("user-agent") ?? "";
   const device = /Mobi|Android/i.test(ua) ? "mobile" : "desktop";
@@ -34,7 +39,7 @@ export async function onRequestPost({ request, env }) {
   env.PDP_ANALYTICS.writeDataPoint({
     indexes: [path.slice(0, 32)],
     blobs: [
-      "view",
+      event,
       path,
       cf.country ?? "",
       cf.region ?? "",

@@ -284,7 +284,16 @@ const MORE = [
         nav.doNotTrack !== "1" && !nav.globalPrivacyControl &&
         "sendBeacon" in navigator
       ) {
-        navigator.sendBeacon("/api/beacon", JSON.stringify({ p: location.pathname }));
+        // "pwa" = launched from the home-screen icon (standalone display),
+        // "view" = ordinary browser tab. Same anonymous payload either way.
+        const standalone =
+          matchMedia("(display-mode: standalone)").matches ||
+          (navigator as Navigator & { standalone?: boolean }).standalone === true;
+        navigator.sendBeacon("/api/beacon", JSON.stringify({ p: location.pathname, e: standalone ? "pwa" : "view" }));
+        // Android/Chrome announces the install moment; iOS never does.
+        window.addEventListener("appinstalled", () => {
+          navigator.sendBeacon("/api/beacon", JSON.stringify({ p: location.pathname, e: "install" }));
+        });
       }
     </script>
   </body>

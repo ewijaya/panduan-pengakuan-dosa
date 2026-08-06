@@ -83,16 +83,21 @@ async function sql(env, query) {
 
 /* --------------------------------------------------- latest-access feed */
 
-const latestQuery = `SELECT timestamp, blob2 AS path, blob3 AS country, blob5 AS city
+const latestQuery = `SELECT timestamp, blob1 AS event, blob2 AS path, blob3 AS country, blob5 AS city
   FROM ${DATASET} WHERE timestamp >= NOW() - INTERVAL '3' DAY
   ORDER BY timestamp DESC LIMIT 24`;
+
+const tickLabel = (r) =>
+  r.event === "install" ? "Memasang aplikasi 📲"
+    : r.event === "pwa" ? `${pageName(r.path)} · aplikasi`
+      : pageName(r.path);
 
 /* Stock-ticker tape: two copies scroll 0 → −50% for a seamless loop. */
 function tickerPanel(rows, error = null) {
   const items = (rows ?? []).map((r) => ({
     time: wibClock(r.timestamp),
     place: [r.city, countryName(r.country)].filter((v) => v && v !== "—").join(", ") || "Tempat tak dikenal",
-    label: pageName(r.path),
+    label: tickLabel(r),
   }));
   const cell = (r) =>
     `<span class="tick"><span class="tick-t">${esc(r.time)}</span><span class="tick-p">${esc(r.place)}</span><span class="tick-e">${esc(r.label)}</span></span>`;
@@ -144,10 +149,10 @@ export async function onRequestGet({ request, env }) {
   const chartDays = Math.max(days, 30);
   const since = (d) => `timestamp >= NOW() - INTERVAL '${d}' DAY`;
 
-  let totals, prevTotals, sum7, last24, byDay, byPath, byPlace, byDevice, byLang, byMap, latest, arrivals;
+  let totals, prevTotals, sum7, last24, byDay, byPath, byPlace, byDevice, byLang, byMap, latest, arrivals, byEvent;
   let sqlError = null;
   try {
-    [totals, prevTotals, sum7, last24, byDay, byPath, byPlace, byDevice, byLang, byMap, latest, arrivals] = await Promise.all([
+    [totals, prevTotals, sum7, last24, byDay, byPath, byPlace, byDevice, byLang, byMap, latest, arrivals, byEvent] = await Promise.all([
       sql(env, `SELECT SUM(_sample_interval) AS total FROM ${DATASET} WHERE ${since(days)}`),
       sql(env, `SELECT SUM(_sample_interval) AS total FROM ${DATASET}
         WHERE ${since(days * 2)} AND timestamp < NOW() - INTERVAL '${days}' DAY`),
@@ -172,11 +177,13 @@ export async function onRequestGet({ request, env }) {
           MIN(timestamp) AS first, SUM(_sample_interval) AS total
         FROM ${DATASET} WHERE ${since(90)}
         GROUP BY country, region, city ORDER BY first ASC LIMIT 2000`),
+      sql(env, `SELECT blob1 AS k, SUM(_sample_interval) AS total
+        FROM ${DATASET} WHERE ${since(days)} GROUP BY k ORDER BY total DESC`),
     ]);
   } catch (error) {
     sqlError = error.message;
     totals = prevTotals = sum7 = last24 = [];
-    byDay = byPath = byPlace = byDevice = byLang = byMap = latest = arrivals = [];
+    byDay = byPath = byPlace = byDevice = byLang = byMap = latest = arrivals = byEvent = [];
   }
 
   const total = Number(totals?.[0]?.total ?? 0);
@@ -304,6 +311,13 @@ export async function onRequestGet({ request, env }) {
       `<span class="sseg c${i % 5}" style="flex:${n}" title="${esc(k)} — ${num(n)}">${n / sum >= 0.14 ? `${Math.round((n / sum) * 100)}%` : ""}</span>`).join("")}</div>
       <div class="slegend">${entries.map(([k, n], i) => `<span><i class="sw c${i % 5}"></i>${esc(k)} ${num(n)}</span>`).join(" ")}</div>`;
   };
+
+  /* -- visit sources: browser vs installed app, plus Android installs -- */
+  const SOURCE_LABELS = { view: "peramban", pwa: "aplikasi terpasang" };
+  const sources = (byEvent ?? [])
+    .filter((r) => r.k !== "install")
+    .map((r) => ({ k: SOURCE_LABELS[r.k] ?? r.k, total: r.total }));
+  const installs = Number((byEvent ?? []).find((r) => r.k === "install")?.total ?? 0);
 
   const ranges = [[7, "7 hari"], [30, "30 hari"], [90, "90 hari"]];
 
@@ -591,9 +605,12 @@ export async function onRequestGet({ request, env }) {
   <section class="card">
     <h2>Pembaca — ${days} hari</h2>
     <div class="shares">
+      <div class="share"><h3>Sumber kunjungan</h3>${shareRow(sources)}</div>
       <div class="share"><h3>Perangkat</h3>${shareRow(byDevice)}</div>
       <div class="share"><h3>Bahasa peramban</h3>${shareRow(byLang)}</div>
     </div>
+    <p class="note">"Aplikasi terpasang" = dibuka dari ikon layar utama (terdeteksi di iPhone maupun Android).
+      Pemasangan tercatat: ${num(installs)} — momen pemasangan hanya dapat dideteksi di Android; iPhone tidak pernah mengumumkannya, jadi angka sebenarnya lebih tinggi.</p>
   </section>
 
   <footer><span class="cross">✠</span> Dibuat ${esc(wibStamp(new Date(Date.now()).toISOString().slice(0, 19).replace("T", " ")))} WIB ·
