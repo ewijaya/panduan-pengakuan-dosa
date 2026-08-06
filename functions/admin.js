@@ -603,7 +603,10 @@ export async function onRequestGet({ request, env }) {
   if (!el || !data || !window.L) return;
   var points = JSON.parse(data.textContent);
   var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
-  var map = L.map(el, { minZoom: 2, worldCopyJump: true }).setView([20, 0], 2);
+  // Home view: Indonesia, the whole archipelago — the app's audience.
+  var HOME = [[-11.2, 94.5], [6.3, 141.5]];
+  var map = L.map(el, { minZoom: 2, worldCopyJump: true });
+  map.fitBounds(HOME);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/' + (dark ? 'dark_all' : 'light_all') + '/{z}/{x}/{y}{r}.png', {
     maxZoom: 19, subdomains: 'abcd',
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -614,20 +617,19 @@ export async function onRequestGet({ request, env }) {
       var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
       var button = L.DomUtil.create('a', '', container);
       button.href = '#';
-      button.title = 'Kembali ke tampilan dunia';
-      button.setAttribute('aria-label', 'Kembali ke tampilan dunia');
+      button.title = 'Kembali ke tampilan Indonesia';
+      button.setAttribute('aria-label', 'Kembali ke tampilan Indonesia');
       button.setAttribute('role', 'button');
       button.innerHTML = '&#8634;';
       L.DomEvent.disableClickPropagation(container);
       L.DomEvent.on(button, 'click', L.DomEvent.preventDefault);
-      L.DomEvent.on(button, 'click', function () { map.setView([20, 0], 2); });
+      L.DomEvent.on(button, 'click', function () { map.fitBounds(HOME); });
       return container;
     },
   });
   map.addControl(new ResetControl());
   var max = Math.max(1, ...points.map(function (p) { return p.total; }));
   var hoverable = window.matchMedia && matchMedia('(hover: hover)').matches;
-  var bounds = [];
   points.forEach(function (p) {
     var label = [p.city, p.region, p.country].filter(Boolean).join(', ');
     var marker = L.circleMarker([p.lat, p.lon], {
@@ -638,10 +640,9 @@ export async function onRequestGet({ request, env }) {
     var text = label + ' — ' + p.total.toLocaleString('id-ID') + ' kunjungan';
     if (hoverable) marker.bindTooltip(text);
     marker.bindPopup('<strong>' + escapeHtml(label) + '</strong><br>' + p.total.toLocaleString('id-ID') + ' kunjungan');
-    bounds.push([p.lat, p.lon]);
   });
-  if (bounds.length === 1) map.setView(bounds[0], 8);
-  else if (bounds.length > 1) map.fitBounds(bounds, { padding: [32, 32], maxZoom: 8 });
+  // The view stays on Indonesia regardless of where points fall — zoom out
+  // (or the ↺ control) for the rest of the world.
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
