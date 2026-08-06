@@ -1,5 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
+import { Image } from "astro:assets";
+import bukletCetak from "../../assets/artwork/buklet-cetak.jpg";
 import { loadBooklet } from "../lib/booklet";
 
 const b = loadBooklet();
@@ -51,6 +53,10 @@ const c = b.credits;
       <section class="folio">
         <h2 class="incipit">Kesetiaan teks</h2>
         <p class="lectio">Teks ditampilkan setia pada buklet cetak.</p>
+        <figure class="plate booklet-plate">
+          <Image src={bukletCetak} alt="Buklet cetak 'Sakramen Tobat (Pengakuan Dosa)' terbitan Keuskupan Surabaya" widths={[360, 720, 1200]} sizes="(min-width: 700px) 300px, 70vw" loading="lazy" />
+          <figcaption class="gloss">Buklet cetak yang menjadi sumber aplikasi ini.</figcaption>
+        </figure>
       </section>
 
       <section class="folio">

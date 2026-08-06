@@ -113,6 +113,12 @@
   margin-top: calc(var(--space) * 2.5);
 }
 
+/* the physical booklet on /tentang/ — provenance, mounted like the hero plate */
+.booklet-plate {
+  margin: calc(var(--space) * 5) auto 0;
+  max-width: min(19rem, 70%);
+}
+
 .plate-text .canticle { margin: calc(var(--space) * 2) 0 0; }
 
 .plate-sub {
